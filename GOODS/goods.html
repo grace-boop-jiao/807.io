@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="goodscssstyle.css">
+</head>
+<body>
+    <header>
+        <div>LOGO</div>
+        <input type="text" placeholder="搜尋商品">
+        <div>購物車</div>
+    </header>
+    
+    <nav>
+        <a href="#">主頁</a>
+        <a href="#">熱門推薦</a>
+        <a href="#">幫助中心</a>
+        <a href="#">會員登入</a>
+    </nav>
+    
+    <main class="container">
+        <div class="product-img">商品圖示例</div>
+    
+        <div class="product-info">
+            <h2>商品名稱</h2>
+            <p>價格：$999</p>
+    
+            <div class="rating-stars" id="ratingStars"></div>
+            <p id="ratingText"></p>
+    
+            <div class="btn-group">
+                <button>加入購物車</button>
+                <button>直接購買</button>
+            </div>
+        </div>
+    </main>
+    
+    
+    <section>
+        <div class="tabs">
+            <button class="active" data-tab="intro">商品簡介</button>
+            <button data-tab="nutrition">營養標示</button>
+        </div>
+    
+        <div id="intro" class="tab-content active">
+            商品介紹內容示例
+        </div>
+        <div id="nutrition" class="tab-content">
+            營養標示內容示例
+        </div>
+    </section>
+    
+    
+    <section class="comments-area">
+        <h3>商品評價</h3>
+    
+        <div id="loading">評論載入中...</div>
+        <div id="comment-list"></div>
+    
+        <div class="pagination">
+            <button onclick="prevPage()">上一頁</button>
+            <span id="page-info"></span>
+            <button onclick="nextPage()">下一頁</button>
+        </div>
+    </section>
+    
+    
+    <section class="recommend">
+        <h3>推薦商品</h3>
+        <div class="recommend-grid">
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+            <div class="recommend-item">商品</div>
+        </div>
+    </section>
+    
+
+
+    <script>
+        // 星級評價
+        function renderStars(rating) {
+            let full = Math.floor(rating);
+            let half = rating % 1 >= 0.5;
+            let total = 5;
+            let stars = "";
+        
+            for (let i = 0; i < full; i++) stars += "★";
+            if (half) stars += "☆";
+            while (stars.length < total) stars += "✩";
+        
+            document.getElementById("ratingStars").innerHTML = `<span>${stars}</span>`;
+            document.getElementById("ratingText").innerText = `${rating.toFixed(1)} / 5`;
+        }
+        
+        renderStars(4.3);
+        
+        
+        // Tabs 切換
+        const tabs = document.querySelectorAll(".tabs button");
+        const contents = document.querySelectorAll(".tab-content");
+        
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+        
+                contents.forEach(c => c.classList.remove("active"));
+                document.getElementById(tab.dataset.tab).classList.add("active");
+            });
+        });
+        
+        
+        // AJAX 模擬評論來源
+        let comments = [];
+        let currentPage = 1;
+        const perPage = 2;
+        
+        async function loadComments() {
+            document.getElementById("loading").style.display = "block";
+        
+            try {
+                await new Promise(res => setTimeout(res, 600));
+                comments = [
+                    { user: "小明", rating: 4.5, comment: "超讚！值得推薦", date: "2025-01-01" },
+                    { user: "小華", rating: 4, comment: "品質不錯！", date: "2025-01-02" },
+                    { user: "曉君", rating: 3.5, comment: "普通但還可以", date: "2025-01-03" },
+                    { user: "阿忠", rating: 5, comment: "完美！", date: "2025-01-04" },
+                    { user: "大大", rating: 4.2, comment: "便宜又好用", date: "2025-01-05" }
+                ];
+        
+                renderComments();
+            } catch(e) {
+                document.getElementById("comment-list").innerHTML = "載入失敗";
+            }
+        
+            document.getElementById("loading").style.display = "none";
+        }
+        
+        function renderComments() {
+            const start = (currentPage - 1) * perPage;
+            const displayComments = comments.slice(start, start + perPage);
+        
+            document.getElementById("comment-list").innerHTML = displayComments.map(c =>
+                `
+                <div class="comment-item">
+                    <strong>${c.user}</strong> (${c.date})<br>
+                    評分：${c.rating} ★<br>
+                    ${c.comment}
+                </div>
+                `
+            ).join("");
+        
+            document.getElementById("page-info").innerText =
+                `第 ${currentPage} 頁 / 共 ${Math.ceil(comments.length/perPage)} 頁`;
+        }
+        
+        function nextPage() {
+            if (currentPage < Math.ceil(comments.length / perPage)) {
+                currentPage++;
+                renderComments();
+            }
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderComments();
+            }
+        }
+        
+        loadComments();
+    </script>
+</body>
+</html>
