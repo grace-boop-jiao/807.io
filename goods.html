@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>商品詳情 - SWEET TRADER</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .product-main { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
+        .tab-btn-group { display: flex; width: 100%; gap: 10px; margin-bottom: 0; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: #FFECB3; cursor: pointer; font-weight: bold; font-size: 1.1rem; border-radius: 10px 10px 0 0; }
+        .tab-btn.active { background: #FFD2A6; color: #5C4033; }
+        .tab-content { background: white; padding: 30px; border-radius: 0 0 15px 15px; display: none; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .tab-content.active { display: block; }
+        .review-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+        @media (max-width: 768px) { .product-main { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="marquee-container"><div class="marquee-text">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div></div>
+    <header>
+        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+    </header>
+    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
+
+    <div class="container">
+        <div class="product-main">
+            <div class="card" style="height:400px; background:#eee; display:flex; align-items:center; justify-content:center;">商品圖片</div>
+            <div>
+                <h1>法國經典馬卡龍 (6入)</h1>
+                <p style="font-size: 2rem; color: #FF7F50; margin: 15px 0;">$999</p>
+                <div style="color: #e2b007; font-size: 1.2rem; margin-bottom: 20px;">★★★★☆ (4.5)</div>
+                <div style="display:flex; gap:15px; margin-top: 30px;">
+                    <button class="btn" style="flex:1; padding: 15px; font-size:1.1rem;">加入購物車</button>
+                    <button class="btn" style="flex:1; background:#5C4033; padding: 15px; font-size:1.1rem;">直接購買</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-btn-group">
+            <button class="tab-btn active" onclick="switchTab(event, 'intro')">商品簡介</button>
+            <button class="tab-btn" onclick="switchTab(event, 'nutrition')">營養標示</button>
+        </div>
+        <div id="intro" class="tab-content active"><h3>法國直送</h3><p>嚴選法國進口頂級杏仁粉，外殼酥脆，內餡飽滿。</p></div>
+        <div id="nutrition" class="tab-content"><h3>營養成分 (每100克)</h3><p>熱量: 350大卡 | 蛋白質: 5g | 脂肪: 15g | 糖: 25g</p></div>
+
+        <div class="card" style="margin-bottom: 40px;">
+            <h3>商品評價</h3>
+            <div class="review-item"><strong>王小明</strong> (2025-01-01) 評分：5 ★ <br> 超讚！很有異國風味。</div>
+            <div class="review-item"><strong>李大華</strong> (2025-01-02) 評分：4 ★ <br> 口感不錯。</div>
+        </div>
+
+        <h3 style="margin: 40px 0 20px;">推薦商品</h3>
+        <div id="recList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;"></div>
+    </div>
+
+    <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
+
+    <footer>
+        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
+        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+    </footer>
+
+    <script>
+        function siteSearch() {
+            const val = document.getElementById('globalSearch').value.trim();
+            if(!val) return;
+            location.href = "goods.html"; 
+        }
+        function switchTab(e, id) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            document.getElementById(id).classList.add('active');
+        }
+        const recs = Array.from({length: 5}, (_, i) => ({ id: i+1, name: `各國零食 ${i+1}`, price: 200 + i*50 }));
+        document.getElementById("recList").innerHTML = recs.map(p => `
+            <div class="card" style="text-align:center; cursor:pointer;" onclick="location.href='goods.html'">
+                <div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>
+                <h4>${p.name}</h4><p style="color:#FF7F50; font-weight:bold;">$${p.price}</p><div style="color: #e2b007;">★★★★☆</div>
+            </div>`).join("");
+    </script>
+</body>
+</html>

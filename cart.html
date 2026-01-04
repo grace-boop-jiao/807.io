@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>購物車 - SWEET TRADER</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="marquee-container"><div class="marquee-text">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div></div>
+    <header>
+        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+    </header>
+    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
+
+    <div class="container cart-layout">
+        <aside class="left-col cart-list-container" id="cartListContainer">
+            <h2 style="margin-bottom:20px;">購物車</h2>
+            
+            <div id="cartItems">
+                <div class="card cart-item" data-price="999">
+                    <div class="delete-btn" onclick="removeItem(this)">×</div>
+                    <img src="" alt="商品圖">
+                    <div class="item-details">
+                        <h4 class="p-name">法國馬卡龍 (6入)</h4>
+                        <div class="qty-control">
+                            <button onclick="updateQty(this, -1)">-</button>
+                            <span class="qty">1</span>
+                            <button onclick="updateQty(this, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="item-price">$999</div>
+                </div>
+                <div class="card cart-item" data-price="350">
+                    <div class="delete-btn" onclick="removeItem(this)">×</div>
+                    <img src="" alt="商品圖">
+                    <div class="item-details">
+                        <h4 class="p-name">日本靜岡抹茶蛋糕</h4>
+                        <div class="qty-control">
+                            <button onclick="updateQty(this, -1)">-</button>
+                            <span class="qty">2</span>
+                            <button onclick="updateQty(this, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="item-price">$700</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:20px; text-align:right; font-weight:bold; font-size:1.2rem;">
+                總金額 <span id="cartTotal" style="color:#FF7F50;">$1699</span>
+            </div>
+
+            <button class="btn-action-cart" id="toCheckoutBtn" onclick="toggleCheckout(true)">前往結帳</button>
+        </aside>
+
+        <main class="right-col checkout-container" id="checkoutContainer">
+            <h2 style="margin-bottom:20px;">結帳</h2>
+
+            <div class="form-section">
+                <div class="section-header"><span class="section-title">收件資訊</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
+                <div class="form-grid">
+                    <input type="text" placeholder="姓名">
+                    <input type="tel" placeholder="電話號碼">
+                    <input type="text" placeholder="地址">
+                    <input type="email" placeholder="電子信箱">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header"><span class="section-title">付款方式</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
+                <div class="form-grid">
+                    <select><option>信用卡</option><option>貨到付款</option><option>轉帳</option></select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header"><span class="section-title">收貨地址</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
+                <div class="form-grid">
+                    <select><option>宅配</option><option>超商取貨</option></select>
+                    <input type="text" placeholder="請輸入地址或門市">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header"><span class="section-title">開立發票</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
+                <div class="form-grid">
+                    <select><option>個人電子發票</option><option>公司統編</option><option>捐贈</option></select>
+                    <input type="text" placeholder="載具號碼 / 統編">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header"><span class="section-title">訂單明細</span></div>
+                <div id="checkoutItemsList"></div>
+                <div class="detail-item" style="border-top: 1px solid #ddd; margin-top: 10px; padding-top: 5px;">
+                    <span>運費</span><span>$60</span>
+                </div>
+                <div class="total-row" style="text-align:right; margin-top:10px; font-weight:bold; color:#FF7F50; font-size:1.2rem;">總金額 <span id="checkoutTotal">$1759</span></div>
+            </div>
+
+            <button class="btn-action-cart" onclick="submitOrder()">送出訂單</button>
+        </main>
+    </div>
+
+    <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
+
+    <footer>
+        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
+        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+    </footer>
+
+    <script>
+        function siteSearch() {
+            const val = document.getElementById('globalSearch').value.trim();
+            if(!val) return;
+            location.href = "goods.html"; 
+        }
+
+        function updateQty(btn, change) {
+            const item = btn.closest('.cart-item');
+            const qtySpan = item.querySelector('.qty');
+            let qty = parseInt(qtySpan.innerText) + change;
+            if (qty < 1) qty = 1;
+            qtySpan.innerText = qty;
+            
+            const unitPrice = parseInt(item.dataset.price);
+            item.querySelector('.item-price').innerText = '$' + (unitPrice * qty);
+            calcTotal();
+        }
+
+        function removeItem(btn) {
+            btn.closest('.cart-item').remove();
+            calcTotal();
+        }
+
+        function calcTotal() {
+            let total = 0;
+            document.querySelectorAll('.cart-item').forEach(item => {
+                const priceText = item.querySelector('.item-price').innerText.replace('$', '');
+                total += parseInt(priceText);
+            });
+            document.getElementById('cartTotal').innerText = '$' + total;
+            document.getElementById('checkoutTotal').innerText = '$' + (total + 60);
+            updateCheckoutList();
+        }
+
+        function updateCheckoutList() {
+            const listContainer = document.getElementById('checkoutItemsList');
+            listContainer.innerHTML = '';
+            document.querySelectorAll('.cart-item').forEach(item => {
+                const name = item.querySelector('.p-name').innerText;
+                const qty = item.querySelector('.qty').innerText;
+                const subtotal = item.querySelector('.item-price').innerText;
+                
+                const row = document.createElement('div');
+                row.className = 'detail-item';
+                row.innerHTML = `<span>${name} (x${qty})</span><span>${subtotal}</span>`;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function toggleCheckout(show) {
+            const cartCol = document.getElementById('cartListContainer');
+            const checkCol = document.getElementById('checkoutContainer');
+            const btn = document.getElementById('toCheckoutBtn');
+
+            if(show) {
+                updateCheckoutList();
+                cartCol.classList.add('locked');
+                checkCol.classList.add('active');
+                btn.innerText = "回到購物車";
+                btn.classList.add('back');
+                btn.onclick = () => toggleCheckout(false);
+            } else {
+                cartCol.classList.remove('locked');
+                checkCol.classList.remove('active');
+                btn.innerText = "前往結帳";
+                btn.classList.remove('back');
+                btn.onclick = () => toggleCheckout(true);
+            }
+        }
+
+        function confirmSection(btn) {
+            const section = btn.closest('.form-section');
+            if(section.classList.contains('locked')) {
+                section.classList.remove('locked');
+                btn.innerText = "確認";
+                btn.classList.remove('cancel');
+            } else {
+                section.classList.add('locked');
+                btn.innerText = "取消確認";
+                btn.classList.add('cancel');
+            }
+        }
+
+        function submitOrder() {
+            alert('訂單已送出！');
+            window.location.href = 'member.html';
+        }
+        
+        updateCheckoutList();
+    </script>
+</body>
+</html>
