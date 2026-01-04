@@ -1,25 +1,182 @@
 * {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    text-decoration: none;
+  margin: 0; 
+  padding: 0; 
+  list-style: none; 
+  text-decoration: none; 
+  box-sizing: border-box;
 }
 
-/* 公告 */
+/* PAGE STRUCTURE */
+body {
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr auto auto;
+  gap: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* ANNOUNCEMENT */
 .announcement {
-    width: 100%;
-    background: #111;
-    color: #fff;
-    text-align: center;
-    padding: 8px;
-    font-size: 14px;
+  width: 100%; 
+  background: #111; 
+  color: #fff; 
+  text-align: center; 
+  padding: 8px; 
+  font-size: 14px;
 }
 
-/* Header 內排版的 grid */
-.header {
-    width: 100%;
-    height: 80px;
-    display: block;
-    background-color: #111;
+/* NAVBAR */
+.navbar { 
+  display: flex; 
+  align-items: center; 
+  padding: 20px; 
+} 
+nav {
+   flex: 1; 
+   text-align: right; 
+} 
+nav ul { 
+  display: inline-block; 
+  list-style-type: none;
+} 
+nav ul li { 
+  display: inline-block; 
+  margin-right: 20px; 
+} 
+a { 
+  text-decoration: none; 
+  color: #111; 
 }
 
+.logo {
+  width: 80px;
+  height: 30px;
+  border: 1px solid #000;
+}
+
+.icons {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 15px;
+}
+.icons span {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #000;
+}
+
+/* BANNER */
+.banner {
+  height: 220px;
+  margin: 0 30px;
+  border: 2px solid #000;
+}
+
+/* SEARCH */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  padding: 0 30px;
+}
+.search {
+  height: 36px;
+  border: 1px solid #000;
+}
+.search-btn {
+  width: 90px;
+  border: 1px solid #000;
+}
+
+.filter {
+  width: 120px;
+  border: 1px solid #000;
+}
+
+/* PRODUCTS */
+.products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  padding: 30px;
+}
+
+.product {
+  border: 1px solid #000;
+  padding: 10px;
+}
+
+.product .img {
+  height: 140px;
+  border: 1px solid #aaa;
+  margin-bottom: 10px;
+}
+
+.product .name {
+  height: 16px;
+  background: #ddd;
+}
+
+
+
+/* PAGINATION */
+.pagination {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button,
+.pagination span {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #000;
+}
+
+/* TOP */
+.top {
+  position: fixed;
+  right: 20px;
+  bottom: 100px;
+  width: 50px;
+  height: 50px;
+  border: 1px solid #000;
+}
+
+/* FOOTER */
+.footer {
+  background: #e6f2fa;
+  padding: 20px;
+}
+
+.socials {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  gap: 15px;
+}
+
+.socials span {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #000;
+}
+
+
+/* scrollbar */
+::-webkit-scrollbar {
+  width: 10px; 
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #111; 
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}

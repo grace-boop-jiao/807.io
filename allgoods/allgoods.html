@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="allgoodsstyle.css">
+</head>
+<body>
+    <header>
+        <div>LOGO</div>
+        <input type="text" placeholder="搜尋商品">
+        <div>購物車</div>
+    </header>
+    
+    <nav>
+        <a href="index.html">主頁</a>
+        <a href="#">熱門推薦</a>
+        <a href="#">幫助中心</a>
+        <a href="#">會員登入</a>
+    </nav>
+    
+    
+    <section class="product-section">
+        <h2>全部商品</h2>
+        <div id="productList" class="product-grid"></div>
+    </section>
+
+    <script>
+        // 模擬 API 資料
+        async function loadProducts() {
+            await new Promise(res => setTimeout(res, 500));
+        
+            const data = [
+                { id: 1, name: "商品 A", price: 350, rating: 4.3, img: "" },
+                { id: 2, name: "商品 B", price: 420, rating: 4.8, img: "" },
+                { id: 3, name: "商品 C", price: 299, rating: 3.9, img: "" },
+                { id: 4, name: "商品 D", price: 520, rating: 4.6, img: "" },
+                { id: 5, name: "商品 E", price: 690, rating: 4.1, img: "" },
+                { id: 6, name: "商品 F", price: 888, rating: 4.9, img: "" },
+                { id: 7, name: "商品 G", price: 120, rating: 3.5, img: "" },
+                { id: 8, name: "商品 H", price: 999, rating: 4.7, img: "" },
+                { id: 9, name: "商品 I", price: 200, rating: 4.0, img: "" },
+                { id:10, name: "商品 J", price: 150, rating: 3.8, img: "" }
+            ];
+        
+            renderProducts(data);
+        }
+        
+        function starRating(r) {
+            let full = Math.floor(r);
+            let half = r % 1 >= 0.5;
+            let stars = "";
+        
+            for (let i = 0; i < full; i++) stars += "★";
+            if (half) stars += "☆";
+            while (stars.length < 5) stars += "✩";
+            return stars;
+        }
+        
+        function renderProducts(list) {
+            const productList = document.getElementById("productList");
+        
+            productList.innerHTML = list.map(p => `
+                <div class="product-card" onclick="openProduct(${p.id})">
+                    <div class="product-img"></div>
+                    <h4>${p.name}</h4>
+                    <div class="price">$${p.price}</div>
+                    <div class="stars"><span>${starRating(p.rating)}</span></div>
+                </div>
+            `).join("");
+        }
+        
+        function openProduct(id) {
+            window.location.href = `index.html?id=${id}`;
+        }
+        
+        loadProducts();
+    </script>
+
+</body>
+</html>

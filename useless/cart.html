@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cart2</title>
+    <link rel="stylesheet" href="cart.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="announcement">
+        新年回饋祭最高 10% OFF ｜ 滿 $2500 免運
+    </div>
+
+    <header>
+        <a href="index.html" class="logo">LOGO</a>
+        <div class="search-bar">
+            <input type="text" placeholder="搜尋商品...">
+            <button class="search-btn">搜尋</button>
+        </div>
+        <div class="header-icons">
+            <a href="cart.html" class="icon-link">購物車</a>
+            <a href="login.html" class="icon-link">會員登入</a>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">首頁</a></li>
+            <li><a href="about.html">關於我們</a></li>
+            <li><a href="products.html">商品總覽</a></li>
+            <li><a href="help.html">幫助中心</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        
+        <aside class="left-col" id="cart-side">
+            <h2>購物車</h2>
+            
+            <div id="cart-list">
+                <div class="sketch-box cart-item" data-price="100">
+                    <div class="close-btn" onclick="deleteItem(this)">×</div>
+                    <div class="item-img">照片</div>
+                    <div class="item-details">
+                        <div class="item-name">精選商品 A</div>
+                        <div class="qty-control">
+                            <button onclick="updateQty(this, -1)">-</button>
+                            <span class="qty-val">1</span>
+                            <button onclick="updateQty(this, 1)">+</button>
+                        </div>
+                        <div class="item-price">$100</div>
+                    </div>
+                </div>
+
+                <div class="sketch-box cart-item" data-price="250">
+                    <div class="close-btn" onclick="deleteItem(this)">×</div>
+                    <div class="item-img">照片</div>
+                    <div class="item-details">
+                        <div class="item-name">精選商品 B</div>
+                        <div class="qty-control">
+                            <button onclick="updateQty(this, -1)">-</button>
+                            <span class="qty-val">1</span>
+                            <button onclick="updateQty(this, 1)">+</button>
+                        </div>
+                        <div class="item-price">$250</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cart-total">
+                總金額 $<span id="grand-total">350</span>
+            </div>
+
+            <button class="btn-checkout-nav" id="checkout-toggle-btn" onclick="handleCheckoutStep()">前往結帳</button>
+        </aside>
+
+        <main class="right-col" id="checkout-main" style="display: none;">
+            <h2>結帳</h2>
+
+            <div class="form-section">
+                <span class="section-title">收件資訊</span>
+                <div class="form-box">
+                    <div class="form-grid">
+                        <div><label>姓名</label><input type="text"></div>
+                        <div><label>電話號碼</label><input type="tel"></div>
+                        <div><label>地址</label><input type="text"></div>
+                        <div><label>電子信箱</label><input type="email"></div>
+                    </div>
+                    <button class="btn-confirm" onclick="toggleLock(this)">確認</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <span class="section-title">付款方式</span>
+                <div class="form-box">
+                    <div class="selection-group">
+                        <button class="selection-btn" onclick="selectType(this)">信用卡</button>
+                        <button class="selection-btn" onclick="selectType(this)">電子支付</button>
+                        <button class="selection-btn" onclick="selectType(this)">轉帳</button>
+                    </div>
+                    <input type="text" placeholder="請輸入備註...">
+                    <button class="btn-confirm" onclick="toggleLock(this)">確認</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <span class="section-title">開立發票</span>
+                <div class="form-box">
+                    <div class="selection-group">
+                        <button class="selection-btn" onclick="selectType(this)">統編</button>
+                        <button class="selection-btn" onclick="selectType(this)">捐贈</button>
+                        <button class="selection-btn" onclick="selectType(this)">載具</button>
+                    </div>
+                    <input type="text" placeholder="請輸入...">
+                    <button class="btn-confirm" onclick="toggleLock(this)">確認</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <span class="section-title">檢查訂單</span>
+                <div class="form-box">
+                    <div class="order-check-row"><span>商品總計</span><span id="check-subtotal">$350</span></div>
+                    <div class="order-check-row"><span>運費</span><span>$60</span></div>
+                    <div class="total-row">結帳總額 $<span id="check-final">410</span></div>
+                </div>
+            </div>
+
+            <button class="btn-submit">送出訂單</button>
+        </main>
+    </div>
+
+    <div class="top-btn" onclick="scrollToTop()">
+        <span>TOP</span>
+    </div>
+
+    <footer>
+        <div class="footer-social">
+            <a href="#" class="social-icon">IG</a>
+            <a href="#" class="social-icon">FB</a>
+            <a href="#" class="social-icon">LN</a>
+            <a href="#" class="social-icon">MD</a>
+        </div>
+        <div class="copyright">
+            &copy; COPYRIGHT 807dorm
+        </div>
+    </footer>
+
+    <script>
+        // 1. 數量增減與金額計算
+        function updateQty(btn, change) {
+            const qtySpan = btn.parentElement.querySelector('.qty-val');
+            let qty = parseInt(qtySpan.innerText) + change;
+            if (qty < 1) qty = 1;
+            qtySpan.innerText = qty;
+            calculateTotal();
+        }
+
+        // 2. 刪除商品
+        function deleteItem(btn) {
+            if (confirm("確定要移除此商品？")) {
+                btn.closest('.cart-item').remove();
+                calculateTotal();
+            }
+        }
+
+        // 3. 計算總金額
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('.cart-item').forEach(item => {
+                const price = parseInt(item.getAttribute('data-price'));
+                const qty = parseInt(item.querySelector('.qty-val').innerText);
+                total += price * qty;
+            });
+            
+            document.getElementById('grand-total').innerText = total;
+            // 同步更新結帳區金額
+            const checkSub = document.getElementById('check-subtotal');
+            if (checkSub) {
+                checkSub.innerText = '$' + total;
+                document.getElementById('check-final').innerText = total + 60;
+            }
+        }
+
+        // 4. 前往結帳 / 回到購物車 切換
+        function handleCheckoutStep() {
+            const cartSide = document.getElementById('cart-side');
+            const checkoutMain = document.getElementById('checkout-main');
+            const toggleBtn = document.getElementById('checkout-toggle-btn');
+
+            if (checkoutMain.style.display === "none") {
+                // 進入結帳
+                checkoutMain.style.display = "block";
+                cartSide.classList.add('locked');
+                toggleBtn.innerText = "回到購物車";
+                window.scrollTo({ top: checkoutMain.offsetTop - 50, behavior: 'smooth' });
+            } else {
+                // 返回購物車
+                checkoutMain.style.display = "none";
+                cartSide.classList.remove('locked');
+                toggleBtn.innerText = "前往結帳";
+            }
+        }
+
+        // 5. 結帳區塊鎖定/解鎖
+        function toggleLock(btn) {
+            const section = btn.closest('.form-section');
+            const inputs = section.querySelectorAll('input');
+            
+            if (section.classList.contains('is-locked')) {
+                // 解鎖
+                section.classList.remove('is-locked');
+                inputs.forEach(i => i.disabled = false);
+                btn.innerText = "確認";
+            } else {
+                // 鎖定
+                section.classList.add('is-locked');
+                inputs.forEach(i => i.disabled = true);
+                btn.innerText = "取消確認";
+            }
+        }
+
+        // 6. 選擇按鈕效果 (付款/發票)
+        function selectType(btn) {
+            const group = btn.parentElement;
+            group.querySelectorAll('.selection-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // 7. 回到頂部
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

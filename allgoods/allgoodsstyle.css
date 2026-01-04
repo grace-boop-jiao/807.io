@@ -1,0 +1,100 @@
+body {
+    margin: 0;
+    font-family: 'Noto Sans TC', sans-serif;
+    background: #f7f7f7;
+    color: #333;
+}
+
+/* Header */
+header {
+    display: grid;
+    grid-template-columns: 120px 1fr 120px;
+    gap: 10px;
+    align-items: center;
+    background: #5a5a5a;
+    padding: 10px 20px;
+    color: white;
+}
+header input {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+nav {
+    background: #4c4c4c;
+    color: white;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    justify-items: center;
+    padding: 12px 0;
+}
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* 商品 Grid */
+.product-section {
+    padding: 20px;
+}
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    text-align: center;
+    padding-bottom: 12px;
+    transition: 0.2s;
+}
+.product-card:hover {
+    transform: translateY(-3px);
+}
+
+.product-img {
+    background: #ccc;
+    height: 150px;
+    border-radius: 10px 10px 0 0;
+}
+
+.product-card h4 {
+    margin: 12px 0 6px 0;
+    font-size: 16px;
+}
+.price {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d10d0d;
+    margin-bottom: 6px;
+}
+
+.stars span {
+    font-size: 14px;
+    color: #e2b007;
+}
+
+/* RWD */
+@media(max-width: 992px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    nav {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media(max-width: 600px) {
+    header {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
