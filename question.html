@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>常見問題 - SWEET TRADER</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="marquee-container"><div class="marquee-text">✨ 疑難雜症看這裡，快速解決您的問題 ✨</div></div>
+    <header>
+        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+    </header>
+    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
+
+    <div class="container" style="max-width: 800px;">
+        <h2 style="text-align: center; margin-bottom: 30px;">常見問題 (FAQ)</h2>
+        
+        <div class="card">
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAcc(this)">Q1: 如何購買各國零食？ <span style="float:right;">+</span></div>
+                <div class="accordion-content">A: 請至「商品總覽」挑選您喜歡的商品，加入購物車後進行結帳即可。我們提供世界各地的精選零食。</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAcc(this)">Q2: 運費如何計算？ <span style="float:right;">+</span></div>
+                <div class="accordion-content">A: 全館單筆訂單滿 $2500 免運費，未滿則收取 $60 運費。</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAcc(this)">Q3: 多久會收到商品？ <span style="float:right;">+</span></div>
+                <div class="accordion-content">A: 國內運送約 3-5 個工作天，部分需海外代購商品可能需 7-14 天，我們會盡快讓您品嚐到異國美味。</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAcc(this)">Q4: 提供哪些付款方式？ <span style="float:right;">+</span></div>
+                <div class="accordion-content">A: 我們支援信用卡、ATM 轉帳、貨到付款以及電子支付。</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
+
+    <footer>
+        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
+        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+    </footer>
+
+    <script>
+        function siteSearch() {
+            const val = document.getElementById('globalSearch').value.trim();
+            if(!val) return;
+            location.href = "goods.html"; 
+        }
+        function toggleAcc(header) {
+            const content = header.nextElementSibling;
+            content.classList.toggle('active');
+            const span = header.querySelector('span');
+            span.innerText = content.classList.contains('active') ? '-' : '+';
+        }
+    </script>
+</body>
+</html>

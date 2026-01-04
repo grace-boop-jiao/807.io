@@ -1,23 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>807-online-store</title>
+    <title>SWEET TRADER - 首頁</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Announcement 公告 -->
-     <div class="announcement"> 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運</div>
-    <!-- Header  -->
-     <header class="header">
-        <div class="header_grid">
-            <div class="nav_container"></div>
-            <div class="logo_container"></div>
-            <div class="search_container"></div>
-            <div class="cart_container"></div>
-        </div>
-     </header>
+    <div class="marquee-container"><div class="marquee-text">✨ 賣國賊 (SWEET TRADER) 新年回饋祭：各國零食滿 $2500 免運！ ✨</div></div>
     
+    <header>
+        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
+        <div class="search-bar">
+            <input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋">
+            <button onclick="siteSearch()">搜尋</button>
+        </div>
+        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+    </header>
+    
+    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
+
+    <div class="container">
+        <div class="hero-slider">
+            <div class="slide-content" id="heroText">🌍 賣國賊：不出國也能吃遍世界！ 🌍</div>
+        </div>
+
+        <div class="mid-filter">
+            <div class="filter-left">
+                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋">
+                <button class="btn" onclick="filterProducts()">搜尋</button>
+            </div>
+            <div class="filter-right">
+                <select id="midCategory" onchange="filterProducts()">
+                    <option value="all">所有類別</option>
+                    <option value="japan">日本 (Japan)</option>
+                    <option value="france">法國 (France)</option>
+                    <option value="usa">美國 (USA)</option>
+                    <option value="uk">英國 (UK)</option>
+                    <option value="korea">韓國 (Korea)</option>
+                </select>
+            </div>
+        </div>
+
+        <h2>熱門推薦商品</h2>
+        <div id="recommendList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 20px;"></div>
+    </div>
+
+    <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
+
+    <footer>
+        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
+        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+    </footer>
+
+    <script>
+        function siteSearch() {
+            const val = document.getElementById('globalSearch').value.trim();
+            if(!val) return;
+            if (val.includes("會員")) location.href = "member.html";
+            else if (val.includes("關於") || val.includes("團隊")) location.href = "team.html";
+            else if (val.includes("購物車")) location.href = "cart.html";
+            else location.href = "goods.html"; 
+        }
+
+        const ads = ["🌍 賣國賊：不出國也能吃遍世界！ 🌍", "🇯🇵 日本抹茶季：第二件半價 🇯🇵", "🇫🇷 法國馬卡龍：浪漫直送到家 🇫🇷"];
+        let adIdx = 0;
+        setInterval(() => {
+            adIdx = (adIdx + 1) % ads.length;
+            const el = document.getElementById("heroText");
+            el.style.animation = 'none'; el.offsetHeight; el.style.animation = 'fadeSlide 6s infinite';
+            el.innerText = ads[adIdx];
+        }, 6000);
+
+        const allProducts = [
+            { id: 1, name: "日本靜岡抹茶蛋糕", price: 350, cat: "japan" }, 
+            { id: 2, name: "美國重磅巧克力餅乾", price: 150, cat: "usa" },
+            { id: 3, name: "法國巴黎馬卡龍", price: 450, cat: "france" }, 
+            { id: 4, name: "英國皇家伯爵茶餅", price: 280, cat: "uk" },
+            { id: 5, name: "韓國起司夾心餅", price: 120, cat: "korea" }, 
+            { id: 6, name: "日本白色戀人", price: 480, cat: "japan" },
+            { id: 7, name: "紐約起司蛋糕", price: 320, cat: "usa" }, 
+            { id: 8, name: "法國檸檬塔", price: 160, cat: "france" }
+        ];
+
+        function renderProducts(list) {
+            document.getElementById("recommendList").innerHTML = list.map(p => `
+                <div class="card" style="text-align:center; cursor:pointer; transition:0.3s;" onclick="location.href='goods.html'">
+                    <div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>
+                    <h4>${p.name}</h4><p style="color:#FF7F50; font-weight:bold;">$${p.price}</p><div style="color: #e2b007;">★★★★☆</div>
+                </div>
+            `).join("");
+        }
+        renderProducts(allProducts);
+
+        function filterProducts() {
+            const key = document.getElementById("midSearch").value.toLowerCase();
+            const cat = document.getElementById("midCategory").value;
+            renderProducts(allProducts.filter(p => (cat === "all" || p.cat === cat) && p.name.includes(key)));
+        }
+    </script>
 </body>
 </html>
