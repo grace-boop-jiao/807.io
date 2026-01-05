@@ -2,15 +2,16 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>關於我們 - SWEET TRADER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>關於我們 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="marquee-container"><div class="marquee-text">✨ 認識我們的團隊 ✨ 致力於為您提供最優質的甜點體驗 ✨</div></div>
+    <div class="marquee-container">✨ 認識我們的團隊 ✨ 致力於為您提供最優質的甜點體驗 ✨</div>
     <header>
-        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
         <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
@@ -18,9 +19,10 @@
     <div class="container">
         <h2 class="brand-intro-title">品牌介紹</h2>
         <div class="card" style="margin-bottom: 40px; text-align: center;">
-            <img src="" alt="Brand Logo" class="brand-logo-img">
-            <h1 style="margin-bottom: 20px; font-size: 1.8rem; color: #FF7F50;">賣國賊 (SWEET TRADER)</h1>
-            <div style="text-align: left; line-height: 1.8; max-width: 800px; margin: 0 auto; font-size: 1rem; color: #444;">
+            <div class="brand-logo-place">Logo 照片</div>
+            
+            <h1 style="margin-bottom: 20px; font-size: 1.8rem; color: #FF7F50;">賣國賊 (Treat Trader)</h1>
+            <div class="brand-intro-box">
                 <p><strong>(1) 主題發想：</strong><br>
                 我們的專案發想是從一個玩笑般的諧音梗開始的。在討論階段時，有個組員開玩笑地說，如果我們賣的是國家，我們品牌就能叫做賣國賊了。結果我們最後竟然決定要賣各國特色零食，然後品牌名真的就是「賣國賊」！</p>
                 <br>
@@ -29,25 +31,25 @@
             </div>
         </div>
 
-        <h2 style="text-align:center; margin-bottom:20px; font-size: 1.5rem; color: #5C4033; font-weight: bold;">組員介紹</h2>
+        <h2 class="brand-intro-title">組員介紹</h2>
         <div class="team-grid">
             <div class="team-card">
-                <img src="" class="member-avatar">
+                <div class="member-avatar"></div>
                 <h3>資管二甲 李妍庭</h3>
                 <p>學到會員系統設計與前端美化，對色彩搭配更有概念。</p>
             </div>
             <div class="team-card">
-                <img src="" class="member-avatar">
+                <div class="member-avatar"></div>
                 <h3>資官二甲 丁聖曦</h3>
                 <p>學會黑黃配色與網頁排版技巧，了解用色影響用戶體驗。</p>
             </div>
             <div class="team-card">
-                <img src="" class="member-avatar">
+                <div class="member-avatar"></div>
                 <h3>資管二甲 焦紫菱</h3>
                 <p>熟悉卡片化排版與表格設計，對長條式排版掌握更好。</p>
             </div>
             <div class="team-card">
-                <img src="" class="member-avatar">
+                <div class="member-avatar"></div>
                 <h3>資管二甲 張庭瑀</h3>
                 <p>前端互動與會員資料整合實務經驗，掌握卡片長條排版。</p>
             </div>
@@ -57,16 +59,13 @@
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">&copy; COPYRIGHT 807dorm</p>
     </footer>
     <script>
-        function siteSearch() {
-            const val = document.getElementById('globalSearch').value.trim();
-            if(!val) return;
-            location.href = "goods.html"; 
-        }
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        function siteSearch() { location.href = "goods.html?id=1"; }
     </script>
 </body>
 </html>

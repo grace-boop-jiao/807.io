@@ -2,15 +2,16 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>購物車 - SWEET TRADER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="marquee-container"><div class="marquee-text">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div></div>
+    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
     <header>
-        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
         <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
@@ -18,7 +19,6 @@
     <div class="container cart-layout">
         <aside class="left-col cart-list-container" id="cartListContainer">
             <h2 style="margin-bottom:20px;">購物車</h2>
-            
             <div id="cartItems">
                 <div class="card cart-item" data-price="999">
                     <div class="delete-btn" onclick="removeItem(this)">×</div>
@@ -27,7 +27,7 @@
                         <h4 class="p-name">法國馬卡龍 (6入)</h4>
                         <div class="qty-control">
                             <button onclick="updateQty(this, -1)">-</button>
-                            <span class="qty">1</span>
+                            <span class="qty-val">1</span>
                             <button onclick="updateQty(this, 1)">+</button>
                         </div>
                     </div>
@@ -40,24 +40,21 @@
                         <h4 class="p-name">日本靜岡抹茶蛋糕</h4>
                         <div class="qty-control">
                             <button onclick="updateQty(this, -1)">-</button>
-                            <span class="qty">2</span>
+                            <span class="qty-val">2</span>
                             <button onclick="updateQty(this, 1)">+</button>
                         </div>
                     </div>
                     <div class="item-price">$700</div>
                 </div>
             </div>
-
             <div class="card" style="margin-top:20px; text-align:right; font-weight:bold; font-size:1.2rem;">
                 總金額 <span id="cartTotal" style="color:#FF7F50;">$1699</span>
             </div>
-
-            <button class="btn-action-cart" id="toCheckoutBtn" onclick="toggleCheckout(true)">前往結帳</button>
+            <button class="btn-checkout-nav" id="toCheckoutBtn" onclick="toggleCheckout(true)">前往結帳</button>
         </aside>
 
         <main class="right-col checkout-container" id="checkoutContainer">
             <h2 style="margin-bottom:20px;">結帳</h2>
-
             <div class="form-section">
                 <div class="section-header"><span class="section-title">收件資訊</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
                 <div class="form-grid">
@@ -67,14 +64,13 @@
                     <input type="email" placeholder="電子信箱">
                 </div>
             </div>
-
             <div class="form-section">
                 <div class="section-header"><span class="section-title">付款方式</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
                 <div class="form-grid">
                     <select><option>信用卡</option><option>貨到付款</option><option>轉帳</option></select>
+                    <input type="text" placeholder="請輸入備註...">
                 </div>
             </div>
-
             <div class="form-section">
                 <div class="section-header"><span class="section-title">收貨地址</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
                 <div class="form-grid">
@@ -82,7 +78,6 @@
                     <input type="text" placeholder="請輸入地址或門市">
                 </div>
             </div>
-
             <div class="form-section">
                 <div class="section-header"><span class="section-title">開立發票</span><button class="btn-confirm" onclick="confirmSection(this)">確認</button></div>
                 <div class="form-grid">
@@ -90,43 +85,35 @@
                     <input type="text" placeholder="載具號碼 / 統編">
                 </div>
             </div>
-
             <div class="form-section">
                 <div class="section-header"><span class="section-title">訂單明細</span></div>
                 <div id="checkoutItemsList"></div>
-                <div class="detail-item" style="border-top: 1px solid #ddd; margin-top: 10px; padding-top: 5px;">
-                    <span>運費</span><span>$60</span>
-                </div>
+                <div class="detail-item" style="border-top: 1px solid #ddd; margin-top: 10px; padding-top: 5px;"><span>運費</span><span>$60</span></div>
                 <div class="total-row" style="text-align:right; margin-top:10px; font-weight:bold; color:#FF7F50; font-size:1.2rem;">總金額 <span id="checkoutTotal">$1759</span></div>
             </div>
-
-            <button class="btn-action-cart" onclick="submitOrder()">送出訂單</button>
+            <button class="btn-submit" onclick="submitOrder()">送出訂單</button>
         </main>
     </div>
 
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">&copy; COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
-        function siteSearch() {
-            const val = document.getElementById('globalSearch').value.trim();
-            if(!val) return;
-            location.href = "goods.html"; 
-        }
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        function siteSearch() { location.href = "goods.html?id=1"; }
 
         function updateQty(btn, change) {
-            const item = btn.closest('.cart-item');
-            const qtySpan = item.querySelector('.qty');
-            let qty = parseInt(qtySpan.innerText) + change;
+            var item = btn.closest('.cart-item');
+            var qtySpan = item.querySelector('.qty-val');
+            var qty = parseInt(qtySpan.innerText) + change;
             if (qty < 1) qty = 1;
             qtySpan.innerText = qty;
-            
-            const unitPrice = parseInt(item.dataset.price);
+            var unitPrice = parseInt(item.dataset.price);
             item.querySelector('.item-price').innerText = '$' + (unitPrice * qty);
             calcTotal();
         }
@@ -137,35 +124,36 @@
         }
 
         function calcTotal() {
-            let total = 0;
-            document.querySelectorAll('.cart-item').forEach(item => {
-                const priceText = item.querySelector('.item-price').innerText.replace('$', '');
+            var total = 0;
+            var items = document.querySelectorAll('.cart-item');
+            for(var i=0; i<items.length; i++) {
+                var priceText = items[i].querySelector('.item-price').innerText.replace('$', '');
                 total += parseInt(priceText);
-            });
+            }
             document.getElementById('cartTotal').innerText = '$' + total;
             document.getElementById('checkoutTotal').innerText = '$' + (total + 60);
             updateCheckoutList();
         }
 
         function updateCheckoutList() {
-            const listContainer = document.getElementById('checkoutItemsList');
+            var listContainer = document.getElementById('checkoutItemsList');
             listContainer.innerHTML = '';
-            document.querySelectorAll('.cart-item').forEach(item => {
-                const name = item.querySelector('.p-name').innerText;
-                const qty = item.querySelector('.qty').innerText;
-                const subtotal = item.querySelector('.item-price').innerText;
-                
-                const row = document.createElement('div');
+            var items = document.querySelectorAll('.cart-item');
+            for(var i=0; i<items.length; i++) {
+                var name = items[i].querySelector('.p-name').innerText;
+                var qty = items[i].querySelector('.qty-val').innerText;
+                var subtotal = items[i].querySelector('.item-price').innerText;
+                var row = document.createElement('div');
                 row.className = 'detail-item';
-                row.innerHTML = `<span>${name} (x${qty})</span><span>${subtotal}</span>`;
+                row.innerHTML = '<span>' + name + ' (x' + qty + ')</span><span>' + subtotal + '</span>';
                 listContainer.appendChild(row);
-            });
+            }
         }
 
         function toggleCheckout(show) {
-            const cartCol = document.getElementById('cartListContainer');
-            const checkCol = document.getElementById('checkoutContainer');
-            const btn = document.getElementById('toCheckoutBtn');
+            var cartCol = document.getElementById('cartListContainer');
+            var checkCol = document.getElementById('checkoutContainer');
+            var btn = document.getElementById('toCheckoutBtn');
 
             if(show) {
                 updateCheckoutList();
@@ -173,18 +161,18 @@
                 checkCol.classList.add('active');
                 btn.innerText = "回到購物車";
                 btn.classList.add('back');
-                btn.onclick = () => toggleCheckout(false);
+                btn.onclick = function() { toggleCheckout(false); };
             } else {
                 cartCol.classList.remove('locked');
                 checkCol.classList.remove('active');
                 btn.innerText = "前往結帳";
                 btn.classList.remove('back');
-                btn.onclick = () => toggleCheckout(true);
+                btn.onclick = function() { toggleCheckout(true); };
             }
         }
 
         function confirmSection(btn) {
-            const section = btn.closest('.form-section');
+            var section = btn.closest('.form-section');
             if(section.classList.contains('locked')) {
                 section.classList.remove('locked');
                 btn.innerText = "確認";
@@ -197,10 +185,20 @@
         }
 
         function submitOrder() {
+            var sections = document.querySelectorAll('.form-section');
+            var allConfirmed = true;
+            for(var i=0; i<sections.length; i++) {
+                if(sections[i].querySelector('.btn-confirm') && !sections[i].classList.contains('locked')) {
+                    allConfirmed = false;
+                }
+            }
+            if(!allConfirmed) {
+                alert("請先確認所有結帳資訊！");
+                return;
+            }
             alert('訂單已送出！');
             window.location.href = 'member.html';
         }
-        
         updateCheckoutList();
     </script>
 </body>
