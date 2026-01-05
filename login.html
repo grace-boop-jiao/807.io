@@ -2,30 +2,31 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>登入 / 註冊 - SWEET TRADER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入 / 註冊 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="marquee-container"><div class="marquee-text">✨ 官網限定：註冊新會員立即享 50 元折價券 ✨</div></div>
+    <div class="marquee-container">✨ 官網限定：註冊新會員立即享 50 元折價券 ✨</div>
     <header>
-        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
         <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
 
     <div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-        <div class="card">
+        <div class="card" class="login-container">
             <h2>會員登入</h2>
             <form style="margin-top: 20px;" onsubmit="event.preventDefault(); location.href='member.html';">
                 <input type="email" placeholder="帳號 (Email)" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px;">
                 <input type="password" placeholder="密碼" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px;">
-                <div style="text-align:right; margin-bottom:15px;"><a href="forget.html" style="color:#FF7F50; font-size:0.9rem;">忘記密碼？</a></div>
+                <div style="text-align:right; margin-bottom:15px;"><a href="#" onclick="showForgetModal()" style="color:#FF7F50; font-size:0.9rem;">忘記密碼？</a></div>
                 <button class="btn" style="width:100%; font-size:1.1rem;">登入</button>
             </form>
         </div>
-        <div class="card">
+        <div class="card" class="login-container">
             <h2>新會員註冊</h2>
             <form style="margin-top: 20px;" onsubmit="event.preventDefault(); location.href='member.html';">
                 <input type="text" placeholder="姓名" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px;">
@@ -37,18 +38,39 @@
         </div>
     </div>
 
+    <div id="forgetModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>找回密碼</h3>
+            <p style="margin:10px 0;">請輸入您的 Email 與電話。</p>
+            <input type="email" id="forgetEmail" placeholder="Email" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:5px;">
+            <input type="tel" id="forgetPhone" placeholder="電話號碼" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd; border-radius:5px;">
+            <button class="btn" onclick="confirmForget()">確認</button>
+            <button class="btn" style="background:#aaa; margin-left:10px;" onclick="closeForgetModal()">取消</button>
+        </div>
+    </div>
+
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">&copy; COPYRIGHT 807dorm</p>
     </footer>
     <script>
-        function siteSearch() {
-            const val = document.getElementById('globalSearch').value.trim();
-            if(!val) return;
-            location.href = "goods.html"; 
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        function siteSearch() { location.href = "goods.html?id=1"; }
+        function showForgetModal() { document.getElementById('forgetModal').style.display = 'flex'; }
+        function closeForgetModal() { document.getElementById('forgetModal').style.display = 'none'; }
+        
+        function confirmForget() {
+            var email = document.getElementById('forgetEmail').value;
+            var phone = document.getElementById('forgetPhone').value;
+            if(!email || !phone) {
+                alert("請填寫所有欄位！");
+                return;
+            }
+            alert('已寄送重設連結至 ' + email);
+            closeForgetModal();
         }
     </script>
 </body>

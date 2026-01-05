@@ -2,25 +2,16 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>商品詳情 - SWEET TRADER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品詳情 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .product-main { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
-        .tab-btn-group { display: flex; width: 100%; gap: 10px; margin-bottom: 0; }
-        .tab-btn { flex: 1; padding: 15px; border: none; background: #FFECB3; cursor: pointer; font-weight: bold; font-size: 1.1rem; border-radius: 10px 10px 0 0; }
-        .tab-btn.active { background: #FFD2A6; color: #5C4033; }
-        .tab-content { background: white; padding: 30px; border-radius: 0 0 15px 15px; display: none; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .tab-content.active { display: block; }
-        .review-item { border-bottom: 1px solid #eee; padding: 15px 0; }
-        @media (max-width: 768px) { .product-main { grid-template-columns: 1fr; } }
-    </style>
 </head>
 <body>
-    <div class="marquee-container"><div class="marquee-text">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div></div>
+    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
     <header>
-        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
         <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
@@ -29,12 +20,12 @@
         <div class="product-main">
             <div class="card" style="height:400px; background:#eee; display:flex; align-items:center; justify-content:center;">商品圖片</div>
             <div>
-                <h1>法國經典馬卡龍 (6入)</h1>
-                <p style="font-size: 2rem; color: #FF7F50; margin: 15px 0;">$999</p>
+                <h1 id="pName">商品名稱載入中...</h1>
+                <p id="pPrice" style="font-size: 2rem; color: #FF7F50; margin: 15px 0;">$0</p>
                 <div style="color: #e2b007; font-size: 1.2rem; margin-bottom: 20px;">★★★★☆ (4.5)</div>
                 <div style="display:flex; gap:15px; margin-top: 30px;">
-                    <button class="btn" style="flex:1; padding: 15px; font-size:1.1rem;">加入購物車</button>
-                    <button class="btn" style="flex:1; background:#5C4033; padding: 15px; font-size:1.1rem;">直接購買</button>
+                    <button class="btn" style="flex:1; padding: 15px; font-size:1.1rem;" onclick="addToCart()">加入購物車</button>
+                    <button class="btn" style="flex:1; background:#5C4033; padding: 15px; font-size:1.1rem;" onclick="location.href='cart.html'">直接購買</button>
                 </div>
             </div>
         </div>
@@ -43,13 +34,18 @@
             <button class="tab-btn active" onclick="switchTab(event, 'intro')">商品簡介</button>
             <button class="tab-btn" onclick="switchTab(event, 'nutrition')">營養標示</button>
         </div>
-        <div id="intro" class="tab-content active"><h3>法國直送</h3><p>嚴選法國進口頂級杏仁粉，外殼酥脆，內餡飽滿。</p></div>
+        <div id="intro" class="tab-content active"><h3>商品特色</h3><p id="pDesc">嚴選進口頂級原料，外殼酥脆，內餡飽滿，帶給您最道地的異國風味。</p></div>
         <div id="nutrition" class="tab-content"><h3>營養成分 (每100克)</h3><p>熱量: 350大卡 | 蛋白質: 5g | 脂肪: 15g | 糖: 25g</p></div>
 
-        <div class="card" style="margin-bottom: 40px;">
-            <h3>商品評價</h3>
-            <div class="review-item"><strong>王小明</strong> (2025-01-01) 評分：5 ★ <br> 超讚！很有異國風味。</div>
-            <div class="review-item"><strong>李大華</strong> (2025-01-02) 評分：4 ★ <br> 口感不錯。</div>
+        <div class="card" style="margin-bottom: 40px; background: transparent; padding:0; box-shadow: none;">
+            <h3 style="margin-bottom: 15px;">商品評價</h3>
+            <div id="commentList"></div>
+            
+            <div class="pagination">
+                <div class="page-num active" onclick="changePage(1)">1</div>
+                <div class="page-num" onclick="changePage(2)">2</div>
+                <div class="page-num" onclick="changePage(3)">3</div>
+            </div>
         </div>
 
         <h3 style="margin: 40px 0 20px;">推薦商品</h3>
@@ -59,29 +55,82 @@
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">&copy; COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
-        function siteSearch() {
-            const val = document.getElementById('globalSearch').value.trim();
-            if(!val) return;
-            location.href = "goods.html"; 
+        // 完整商品資料庫
+        var productsDB = {
+            '1': { name: "日本靜岡抹茶蛋糕", price: "$350", desc: "來自靜岡的濃郁抹茶香，口感綿密。" },
+            '2': { name: "美國重磅巧克力餅乾", price: "$150", desc: "美式經典，外酥內軟，巧克力豆爆漿。" },
+            '3': { name: "法國巴黎馬卡龍", price: "$450", desc: "法式浪漫，甜而不膩，少女心爆發。" },
+            '4': { name: "英國皇家伯爵茶餅", price: "$280", desc: "下午茶首選，優雅茶香。" },
+            '5': { name: "韓國起司夾心餅", price: "$120", desc: "鹹甜交織，起司控最愛。" },
+            '6': { name: "日本白色戀人", price: "$480", desc: "北海道經典伴手禮。" },
+            '7': { name: "紐約起司蛋糕", price: "$320", desc: "重乳酪風味，濃郁化口。" },
+            '8': { name: "法國檸檬塔", price: "$160", desc: "酸甜清爽，法式甜點代表。" },
+            '9': { name: "德國黑森林蛋糕", price: "$500", desc: "酒漬櫻桃與巧克力的完美結合。" },
+            '10': { name: "義大利提拉米蘇", price: "$380", desc: "帶我走，享受微醺的咖啡香。" },
+            '11': { name: "比利時巧克力", price: "$250", desc: "頂級可可，絲滑柔順。" },
+            '12': { name: "台灣鳳梨酥", price: "$200", desc: "在地土鳳梨，酸甜適中。" }
+        };
+        
+        var urlParams = new URLSearchParams(window.location.search);
+        var pid = urlParams.get('id') || '1'; // 預設顯示 ID 1
+        
+        if(productsDB[pid]) {
+            document.getElementById('pName').innerText = productsDB[pid].name;
+            document.getElementById('pPrice').innerText = productsDB[pid].price;
+            document.getElementById('pDesc').innerText = productsDB[pid].desc;
         }
+
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        function siteSearch() { location.href = "goods.html?id=1"; }
         function switchTab(e, id) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            var tabs = document.querySelectorAll('.tab-btn');
+            var contents = document.querySelectorAll('.tab-content');
+            for(var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
+            for(var j=0; j<contents.length; j++) contents[j].classList.remove('active');
             e.currentTarget.classList.add('active');
             document.getElementById(id).classList.add('active');
         }
-        const recs = Array.from({length: 5}, (_, i) => ({ id: i+1, name: `各國零食 ${i+1}`, price: 200 + i*50 }));
-        document.getElementById("recList").innerHTML = recs.map(p => `
-            <div class="card" style="text-align:center; cursor:pointer;" onclick="location.href='goods.html'">
-                <div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>
-                <h4>${p.name}</h4><p style="color:#FF7F50; font-weight:bold;">$${p.price}</p><div style="color: #e2b007;">★★★★☆</div>
-            </div>`).join("");
+        function addToCart() { alert("已加入購物車！"); }
+        
+        // 推薦商品 (隨機挑選或固定幾個，這裡顯示後5個)
+        var recsHtml = "";
+        for(var i=1; i<=5; i++) {
+            // 避免推薦自己
+            var recId = (parseInt(pid) + i) % 12 + 1;
+            var p = productsDB[recId];
+            if(p) {
+                recsHtml += '<div class="card" style="text-align:center; cursor:pointer;" onclick="location.href=\'goods.html?id='+recId+'\'">' +
+                            '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>' +
+                            '<h4>'+p.name+'</h4><p style="color:#FF7F50; font-weight:bold;">'+p.price+'</p></div>';
+            }
+        }
+        document.getElementById("recList").innerHTML = recsHtml;
+
+        function changePage(page) {
+            var comments = "";
+            if(page === 1) {
+                comments += '<div class="card" style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong>王小明</strong><span style="color:#888; font-size:0.9rem;">2025/01/01</span></div><div style="color:#e2b007; margin-bottom:5px;">★★★★★</div><p>超讚！很有異國風味，包裝精美送禮合適。</p></div>';
+                comments += '<div class="card" style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong>李大華</strong><span style="color:#888; font-size:0.9rem;">2025/01/02</span></div><div style="color:#e2b007; margin-bottom:5px;">★★★★☆</div><p>口感不錯，但稍微偏甜一點，配茶剛好。</p></div>';
+            } else if(page === 2) {
+                comments += '<div class="card" style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong>陳曉東</strong><span style="color:#888; font-size:0.9rem;">2025/01/03</span></div><div style="color:#e2b007; margin-bottom:5px;">★★★★★</div><p>送禮自用兩相宜，會再回購！</p></div>';
+            } else {
+                comments += '<div class="card" style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong>林志玲</strong><span style="color:#888; font-size:0.9rem;">2025/01/04</span></div><div style="color:#e2b007; margin-bottom:5px;">★★★★★</div><p>真的很好吃！</p></div>';
+            }
+            document.getElementById("commentList").innerHTML = comments;
+            
+            var nums = document.querySelectorAll('.page-num');
+            for(var k=0; k<nums.length; k++) {
+                nums[k].classList.remove('active');
+                if(k+1 === page) nums[k].classList.add('active');
+            }
+        }
+        changePage(1);
     </script>
 </body>
 </html>

@@ -2,15 +2,16 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>商品總覽 - SWEET TRADER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品總覽 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="marquee-container"><div class="marquee-text">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div></div>
+    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
     <header>
-        <div class="logo" onclick="location.href='index.html'">SWEET TRADER</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋"><button onclick="siteSearch()">搜尋</button></div>
+        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
+        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
         <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
@@ -23,23 +24,34 @@
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">&copy; COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
-        function siteSearch() {
-            const val = document.getElementById('globalSearch').value.trim();
-            if(!val) return;
-            location.href = "goods.html"; 
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        function siteSearch() { location.href = "goods.html?id=1"; }
+        
+        // 產生 12 個商品，點擊後會帶入不同 ID
+        var data = [];
+        var names = [
+            "日本靜岡抹茶蛋糕", "美國重磅巧克力餅乾", "法國巴黎馬卡龍", "英國皇家伯爵茶餅", 
+            "韓國起司夾心餅", "日本白色戀人", "紐約起司蛋糕", "法國檸檬塔",
+            "德國黑森林蛋糕", "義大利提拉米蘇", "比利時巧克力", "台灣鳳梨酥"
+        ];
+        var prices = [350, 150, 450, 280, 120, 480, 320, 160, 500, 380, 250, 200];
+
+        for(var i=0; i<12; i++) {
+            data.push({ id: i+1, name: names[i] || "特色零食", price: prices[i] || 200 });
         }
-        const data = Array.from({length: 12}, (_, i) => ({ id: i+1, name: `各國特色零食 ${i+1}`, price: 150 + (i*50) }));
-        document.getElementById("productList").innerHTML = data.map(p => `
-            <div class="card" style="text-align:center; cursor:pointer; transition:0.3s;" onclick="location.href='goods.html'">
-                <div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>
-                <h4>${p.name}</h4><p style="color:#FF7F50; font-weight:bold;">$${p.price}</p><div style="color: #e2b007;">★★★★☆</div>
-            </div>`).join("");
+        
+        document.getElementById("productList").innerHTML = data.map(function(p) {
+            return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;">' +
+                   '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>' +
+                   '<h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
+                   '</div>';
+        }).join("");
     </script>
 </body>
 </html>
