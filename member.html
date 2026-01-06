@@ -11,24 +11,30 @@
     <div class="marquee-container">✨ 歡迎回來！查看您的專屬優惠與訂單進度 ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
-        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+        <div class="search-bar">
+            <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
+            <button onclick="siteSearch()">搜尋</button>
+            <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+        <div class="header-icons">
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
+        </div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
 
     <div class="container">
         <div class="member-layout">
-            <div class="card" style="height: fit-content;">
+            <div class="card" style="height: fit-content;" id="profileCard">
                 <div style="text-align:center; margin-bottom:20px;">
                     <div style="width:80px; height:80px; background:#FFD2A6; border-radius:50%; margin: 0 auto 10px;"></div>
-                    <h3>測試會員</h3>
-                    <p style="font-size: 0.9rem; color:#888;">ID: user123</p>
+                    <h3 id="mName">訪客</h3>
                 </div>
                 <div style="padding: 10px 0; border-top: 1px solid #eee;">
-                    <p style="margin-bottom: 10px;"><strong>帳號 (Email):</strong><br>user@example.com</p>
-                    <p><strong>電話號碼:</strong><br>0912-345-678</p>
+                    <p style="margin-bottom: 10px;"><strong>Email:</strong><br><span id="mEmail">請先登入</span></p>
+                    <p><strong>電話:</strong><br><span id="mPhone">-</span></p>
                 </div>
-                <a href="login.html" style="display:block; text-align:center; color:white; background:#d9534f; padding:10px; border-radius:5px; margin-top:20px;">登出</a>
+                <button onclick="logout()" style="width:100%; color:white; background:#d9534f; padding:10px; border-radius:5px; margin-top:20px; border:none; cursor:pointer;">登出</button>
             </div>
 
             <div class="member-fonts" style="display: flex; flex-direction: column; gap: 20px;">
@@ -39,11 +45,6 @@
                         <div class="progress-container"><div class="progress-bar" style="width: 60%;"></div></div>
                         <p style="font-size:0.85rem; text-align:right;">已離開轉運中心</p>
                     </div>
-                    <div>
-                        <div class="order-item" style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>訂單 #2026010502 (法國檸檬塔)</span><span style="color:green; font-weight: bold;">待取貨</span></div>
-                        <div class="progress-container"><div class="progress-bar" style="width: 100%;"></div></div>
-                        <p style="font-size:0.85rem; text-align:right;">商品已到達門市，請盡快取貨</p>
-                    </div>
                 </div>
 
                 <div class="card">
@@ -53,6 +54,13 @@
                         <tr><td>綜合馬卡龍</td><td>2025-12-01</td><td>NT$500</td><td>已完成</td></tr>
                         <tr><td>草莓蛋糕</td><td>2025-11-20</td><td>NT$600</td><td>已完成</td></tr>
                     </table>
+                </div>
+
+                <div class="card">
+                    <h2 class="member-section-title">我的評論紀錄</h2>
+                    <div id="myReviews">
+                        <p>尚無評論紀錄。</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -65,9 +73,69 @@
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">&copy; COPYRIGHT 807dorm</p>
     </footer>
+
     <script>
+        var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+        if(!user) {
+            alert("請先登入！");
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('mName').innerText = user.name;
+            document.getElementById('mEmail').innerText = user.email;
+            document.getElementById('mPhone').innerText = user.phone;
+            document.getElementById('avatarLink').href = "member.html";
+            loadMyReviews(user.email);
+        }
+
+        function logout() {
+            localStorage.removeItem('tt_currentUser');
+            alert("已登出");
+            window.location.href = 'login.html';
+        }
+
+        function loadMyReviews(email) {
+            var reviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
+            var myReviews = reviews.filter(function(r){ return r.userId === email; });
+            
+            if(myReviews.length > 0) {
+                var html = "<table><tr><th>商品</th><th>評分</th><th>內容</th><th>日期</th></tr>";
+                myReviews.forEach(function(r){
+                    html += "<tr>" +
+                            "<td><a href='goods.html?id="+r.pid+"' style='color:#FF7F50;'>"+r.pName+"</a></td>" +
+                            "<td>"+r.rating+"★</td>" +
+                            "<td>"+r.content+"</td>" +
+                            "<td>"+r.date+"</td>" +
+                            "</tr>";
+                });
+                html += "</table>";
+                document.getElementById('myReviews').innerHTML = html;
+            }
+        }
+
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
-        function siteSearch() { location.href = "goods.html?id=1"; }
+        
+        function siteSearch() {
+            var val = document.getElementById('globalSearch').value.trim();
+            if(!val) return;
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.includes(val); });
+                if(matches.length === 0) alert("沒有搜尋到相關商品！");
+                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
+            });
+        }
+        
+        function handleSearchInput(input) {
+            var val = input.value.toLowerCase();
+            var box = document.getElementById('searchSuggestions');
+            if(val.length < 1) { box.style.display = 'none'; return; }
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
+                if(matches.length > 0) {
+                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
+                    box.style.display = 'block';
+                } else { box.style.display = 'none'; }
+            });
+        }
     </script>
 </body>
 </html>

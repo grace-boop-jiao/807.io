@@ -11,8 +11,15 @@
     <div class="marquee-container">✨ 我們樂意為您服務，請留下您的寶貴意見 ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
-        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+        <div class="search-bar">
+            <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
+            <button onclick="siteSearch()">搜尋</button>
+            <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+        <div class="header-icons">
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
+        </div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
 
@@ -20,8 +27,14 @@
         <div class="card">
             <h2 style="text-align: center; margin-bottom: 20px;">幫助中心</h2>
             <form onsubmit="alert('感謝您的回饋，我們會盡快回覆！'); this.reset(); event.preventDefault();">
-                <div style="margin-bottom:15px;"><label>姓名</label><input type="text" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;"></div>
-                <div style="margin-bottom:15px;"><label>Email</label><input type="email" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;"></div>
+                <div style="margin-bottom:15px;">
+                    <label>姓名</label>
+                    <input type="text" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label>Email</label>
+                    <input type="email" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                </div>
                 <div style="margin-bottom:15px;">
                     <label>問題或建議</label>
                     <textarea required style="width:100%; height:150px; padding:10px; border:1px solid #ccc; border-radius:5px; margin-top:5px;"></textarea>
@@ -34,13 +47,46 @@
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
+        <div class="footer-socials">
+            <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+            <a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a>
+            <a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a>
+        </div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
-        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+        <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
+
     <script>
+        window.onload = function() {
+            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+            if(user) document.getElementById('avatarLink').href = "member.html";
+        };
+
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
-        function siteSearch() { location.href = "goods.html?id=1"; }
+        
+        function siteSearch() {
+            var val = document.getElementById('globalSearch').value.trim();
+            if(!val) return;
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.includes(val); });
+                if(matches.length === 0) alert("沒有搜尋到相關商品！");
+                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
+            });
+        }
+        
+        function handleSearchInput(input) {
+            var val = input.value.toLowerCase();
+            var box = document.getElementById('searchSuggestions');
+            if(val.length < 1) { box.style.display = 'none'; return; }
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
+                if(matches.length > 0) {
+                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
+                    box.style.display = 'block';
+                } else { box.style.display = 'none'; }
+            });
+        }
     </script>
 </body>
 </html>

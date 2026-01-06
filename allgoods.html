@@ -11,8 +11,15 @@
     <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event)"><button onclick="siteSearch()">搜尋</button></div>
-        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+        <div class="search-bar">
+            <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
+            <button onclick="siteSearch()">搜尋</button>
+            <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+        <div class="header-icons">
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
+        </div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
 
@@ -30,28 +37,55 @@
     </footer>
 
     <script>
-        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
-        function siteSearch() { location.href = "goods.html?id=1"; }
-        
-        // 產生 12 個商品，點擊後會帶入不同 ID
-        var data = [];
-        var names = [
-            "日本靜岡抹茶蛋糕", "美國重磅巧克力餅乾", "法國巴黎馬卡龍", "英國皇家伯爵茶餅", 
-            "韓國起司夾心餅", "日本白色戀人", "紐約起司蛋糕", "法國檸檬塔",
-            "德國黑森林蛋糕", "義大利提拉米蘇", "比利時巧克力", "台灣鳳梨酥"
-        ];
-        var prices = [350, 150, 450, 280, 120, 480, 320, 160, 500, 380, 250, 200];
+        window.onload = function() {
+            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+            if(user) document.getElementById('avatarLink').href = "member.html";
+        };
 
-        for(var i=0; i<12; i++) {
-            data.push({ id: i+1, name: names[i] || "特色零食", price: prices[i] || 200 });
+        var urlParams = new URLSearchParams(window.location.search);
+        var searchKey = urlParams.get('search');
+
+        fetch('products.json')
+            .then(function(res){ return res.json(); })
+            .then(function(data){
+                var displayData = data;
+                if(searchKey) {
+                    displayData = data.filter(function(p){ return p.name.includes(searchKey); });
+                    document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
+                }
+                
+                document.getElementById("productList").innerHTML = displayData.map(function(p) {
+                    return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;">' +
+                           '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#888;">'+p.name+'</div>' +
+                           '<h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
+                           '</div>';
+                }).join("");
+            });
+
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        
+        function siteSearch() {
+            var val = document.getElementById('globalSearch').value.trim();
+            if(!val) return;
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.includes(val); });
+                if(matches.length === 0) alert("沒有搜尋到相關商品！");
+                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
+            });
         }
         
-        document.getElementById("productList").innerHTML = data.map(function(p) {
-            return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;">' +
-                   '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>' +
-                   '<h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
-                   '</div>';
-        }).join("");
+        function handleSearchInput(input) {
+            var val = input.value.toLowerCase();
+            var box = document.getElementById('searchSuggestions');
+            if(val.length < 1) { box.style.display = 'none'; return; }
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
+                if(matches.length > 0) {
+                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
+                    box.style.display = 'block';
+                } else { box.style.display = 'none'; }
+            });
+        }
     </script>
 </body>
 </html>

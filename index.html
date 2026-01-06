@@ -11,19 +11,26 @@
     <div class="marquee-container">✨ Treat Trader 新年回饋祭：各國零食滿 $2500 免運！ ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
-        <div class="search-bar"><input type="text" id="globalSearch" placeholder="全站功能及商品頁面搜尋" onkeypress="handleEnter(event, 'global')"><button onclick="siteSearch()">搜尋</button></div>
-        <div class="header-icons"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a><a href="login.html"><i class="fa-solid fa-circle-user"></i></a></div>
+        <div class="search-bar">
+            <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
+            <button onclick="siteSearch()">搜尋</button>
+            <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+        <div class="header-icons">
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
+        </div>
     </header>
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
 
     <div class="container">
-        <div class="hero-slider" onclick="location.href='allgoods.html'">
+        <div class="hero-slider" id="heroSlider" onclick="clickAd()">
             <div class="slide-content" id="heroText">🌍 Treat Trader：不出國也能吃遍世界！ 🌍</div>
         </div>
 
         <div class="mid-filter">
             <div class="filter-left">
-                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋" onkeypress="handleEnter(event, 'mid')">
+                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋" onkeypress="handleEnterFilter(event)">
                 <button class="btn" onclick="filterProducts()">搜尋</button>
             </div>
             <div class="filter-right">
@@ -52,53 +59,89 @@
             <a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a>
         </div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
-        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+        <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
-        function handleEnter(e, type) { if(e.key === 'Enter') { type === 'global' ? siteSearch() : filterProducts(); } }
+        window.onload = function() {
+            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+            if(user) document.getElementById('avatarLink').href = "member.html";
+        };
+
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        
         function siteSearch() {
             var val = document.getElementById('globalSearch').value.trim();
             if(!val) return;
-            if(val.includes('商品')) location.href = 'goods.html?id=1';
-            else if(val.includes('會員')) location.href = 'member.html';
-            else if(val.includes('購物')) location.href = 'cart.html';
-            else location.href = 'allgoods.html'; 
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.includes(val); });
+                if(matches.length === 0) {
+                    alert("沒有搜尋到相關商品！");
+                } else {
+                    location.href = "allgoods.html?search=" + encodeURIComponent(val);
+                }
+            });
         }
 
-        var ads = ["🌍 Treat Trader：不出國也能吃遍世界！ 🌍", "🇯🇵 日本抹茶季：第二件半價 🇯🇵", "🇫🇷 法國馬卡龍：浪漫直送到家 🇫🇷"];
-        var adIdx = 0;
-        setInterval(function() {
-            adIdx = (adIdx + 1) % ads.length;
-            document.getElementById("heroText").innerText = ads[adIdx];
-        }, 5000);
+        function handleSearchInput(input) {
+            var val = input.value.toLowerCase();
+            var box = document.getElementById('searchSuggestions');
+            if(val.length < 1) { box.style.display = 'none'; return; }
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
+                if(matches.length > 0) {
+                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
+                    box.style.display = 'block';
+                } else { box.style.display = 'none'; }
+            });
+        }
 
-        // 共用商品資料 (ID 1-8)
-        var allProducts = [
-            { id: 1, name: "日本靜岡抹茶蛋糕", price: 350, cat: "japan" }, 
-            { id: 2, name: "美國重磅巧克力餅乾", price: 150, cat: "usa" },
-            { id: 3, name: "法國巴黎馬卡龍", price: 450, cat: "france" }, 
-            { id: 4, name: "英國皇家伯爵茶餅", price: 280, cat: "uk" },
-            { id: 5, name: "韓國起司夾心餅", price: 120, cat: "korea" }, 
-            { id: 6, name: "日本白色戀人", price: 480, cat: "japan" },
-            { id: 7, name: "紐約起司蛋糕", price: 320, cat: "usa" }, 
-            { id: 8, name: "法國檸檬塔", price: 160, cat: "france" }
+        var ads = [
+            { text: "🇯🇵 日本抹茶蛋糕：第二件半價 (點擊查看)", id: 1 },
+            { text: "🇫🇷 法國馬卡龍：浪漫直送到家 (點擊查看)", id: 3 },
+            { text: "🇺🇸 紐約起司蛋糕：濃郁登場 (點擊查看)", id: 7 }
         ];
+        var adIdx = 0;
+        var currentAdId = 1;
+        
+        function updateAd() {
+            document.getElementById("heroText").innerText = ads[adIdx].text;
+            currentAdId = ads[adIdx].id;
+            adIdx = (adIdx + 1) % ads.length;
+        }
+        updateAd();
+        setInterval(updateAd, 5000);
+
+        function clickAd() {
+            location.href = "goods.html?id=" + currentAdId;
+        }
+
+        var allData = [];
+        fetch('products.json')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                allData = data;
+                renderProducts(data.slice(0, 8));
+            });
 
         function renderProducts(list) {
             document.getElementById("recommendList").innerHTML = list.map(function(p){
                 return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;">' +
-                       '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div>' +
+                       '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#888;">'+p.name+'</div>' +
                        '<h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
                        '</div>';
             }).join("");
         }
-        renderProducts(allProducts);
 
+        function handleEnterFilter(e) { if(e.key === 'Enter') filterProducts(); }
+        
         function filterProducts() {
             var key = document.getElementById("midSearch").value.toLowerCase();
             var cat = document.getElementById("midCategory").value;
-            renderProducts(allProducts.filter(function(p){ return (cat === "all" || p.cat === cat) && p.name.includes(key); }));
+            var filtered = allData.filter(function(p){ 
+                return (cat === "all" || p.category === cat) && p.name.toLowerCase().includes(key); 
+            });
+            renderProducts(filtered);
         }
     </script>
 </body>
