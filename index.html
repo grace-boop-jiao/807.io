@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Treat Trader - 首頁</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .hero-slider { height: 400px; background: #FFE4B5; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; cursor: pointer; color: #5C4033; text-align: center; padding: 0 20px; transition: transform 0.2s; position: relative; }
         .hero-slider:hover { transform: scale(1.01); }
@@ -24,7 +24,7 @@
 
     <header>
         <div class="logo" onclick="location.href='index.html'">
-            <img src="images/logo.png" alt="Logo" style="height: 30px; vertical-align: middle; margin-right: 8px;">
+            <img src="images/Logo.PNG" alt="Logo">
             Treat Trader
         </div>
 
@@ -40,8 +40,6 @@
             <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
         </div>
     </header>
-
-    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
 
     <div class="container">
         <div class="hero-slider" id="heroSlider" onclick="clickAd()">
@@ -65,7 +63,6 @@
                     <option value="uk">英國 (UK)</option>
                     <option value="korea">韓國 (Korea)</option>
                     <option value="tw">台灣 (Taiwan)</option>
-
                 </select>
             </div>
         </div>
@@ -80,8 +77,8 @@
         <div class="footer-socials">
             <a href="https://reurl.cc/xKA8ae" target="_blank">
                 <i class="fa-brands fa-instagram"></i></a>
-            <a href="https://facebook.com" target="_blank">
-                <i class="fa-brands fa-facebook"></i></a>
+            <a href="https://reurl.cc/Vmlo9A" target="_blank">
+                <i class="fa-brands fa-threads"></i></a>
             <a href="https://reurl.cc/9ba94j" target="_blank">
                 <i class="fa-brands fa-line"></i></a>
             <a href="mailto:service@example.com">
@@ -90,7 +87,8 @@
         <div class="footer-links"><a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
-            <script>
+    
+    <script>
         window.onload = function() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
             if(user) document.getElementById('avatarLink').href = "member.html";

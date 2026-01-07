@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品詳情 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .product-main { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
         .tab-btn-group { display: flex; gap: 5px; }
@@ -33,19 +33,24 @@
 <body>
     <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
     <header>
-        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
-        <div class="search-bar">
-            <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
-            <button onclick="siteSearch()">搜尋</button>
-            <div id="searchSuggestions" class="search-suggestions"></div>
+        <div class="logo" onclick="location.href='index.html'">
+            <img src="images/Logo.PNG" alt="Logo">
+            Treat Trader
         </div>
+
+        <nav class="main-nav">
+            <a href="index.html">首頁</a>
+            <a href="allgoods.html">商品總覽</a>
+            <a href="member.html">會員資料</a>
+            <a href="team.html">關於我們</a>
+        </nav>
+
         <div class="header-icons">
             <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
             <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
         </div>
     </header>
-    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
-
+    
     <div class="container">
         <div class="product-main">
             <div id="pImg" class="card" style="height:400px; background:#eee; display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:#888;" id="pImg"></div>
@@ -90,12 +95,22 @@
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
-        <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
+        <div class="footer-socials">
+            <a href="https://reurl.cc/xKA8ae" target="_blank">
+                <i class="fa-brands fa-instagram"></i></a>
+            <a href="https://reurl.cc/Vmlo9A" target="_blank">
+                <i class="fa-brands fa-threads"></i></a>
+            <a href="https://reurl.cc/9ba94j" target="_blank">
+                <i class="fa-brands fa-line"></i></a>
+            <a href="mailto:service@example.com">
+                <i class="fa-solid fa-envelope"></i></a>
+        </div>
+        <div class="footer-links"><a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
+        const API_BASE = "http://localhost:5038/api";
         var urlParams = new URLSearchParams(window.location.search);
         var pid = urlParams.get('id') || '1';
         var currentProduct = null;
@@ -117,7 +132,7 @@
                 starCont.style.opacity = '0.5';
             }
             setRating(5);
-            initFakeData();
+            // initFakeData();
         };
 
         fetch('products.json')
@@ -175,41 +190,67 @@
 
 
         function loadReviews() {
-            var allReviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
-            var pReviews = allReviews.filter(function(r){ return r.pid == pid; });
-            var totalPages = Math.ceil(pReviews.length / reviewsPerPage);
-            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-            var start = (currentPage - 1) * reviewsPerPage;
-            var end = start + reviewsPerPage;
-            var displayData = pReviews.slice(start, end);
-            // 計算並更新上方總評分
-            if (pReviews.length > 0) {
-                var sum = pReviews.reduce(function(a, b){ return a + b.rating; }, 0);
-                var avg = (sum / pReviews.length).toFixed(1);
-                var starsHtml = "";
-                for(var i=1; i<=5; i++) {
-                     if(i <= Math.round(avg)) starsHtml += "★"; else starsHtml += "☆";
-                }
-                document.getElementById("pRatingDisplay").innerHTML = starsHtml + " (" + avg + ")";
-            } else {
-                document.getElementById("pRatingDisplay").innerHTML = "☆☆☆☆☆ (0.0)";
+    // 從後端讀取該商品的評論（帶分頁）
+            fetch(API_BASE + "/Reviews/product/" + pid + "?page=" + currentPage + "&pageSize=" + reviewsPerPage)
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var pReviews = data.items || [];
+                    var total = Math.ceil((data.total || 0) / reviewsPerPage);
+
+                    var container = document.getElementById('reviewList');
+                    if (!container) return;
+
+                    if (pReviews.length === 0) {
+                        container.innerHTML = '<p style="padding:10px;">目前尚無評論，快來當第一個評論的人！</p>';
+                    } else {
+                        container.innerHTML = pReviews.map(function (r) {
+                            var stars = '';
+                            for (var i = 0; i < 5; i++) {
+                                stars += (i < r.rating ? '★' : '☆');
+                            }
+                            return (
+                                '<div class="review-card">' +
+                                    '<div class="review-header">' +
+                                        '<span class="review-user">' + r.userName + '</span>' +
+                                        '<span class="review-date">' + r.date + '</span>' +
+                                    '</div>' +
+                                    '<div class="review-rating">' + stars + '</div>' +
+                                    '<div class="review-content">' + r.content + '</div>' +
+                                '</div>'
+                            );
+                        }).join('');
+                    }
+
+                    // 重新畫分頁
+                    var pageBox = document.getElementById('paginationContainer');
+                    if (!pageBox) return;
+
+                    var html = '';
+
+                    if (total <= 1) {
+                        pageBox.innerHTML = '';
+                        return;
+                    }
+
+                    // 上一頁
+                    if (currentPage > 1) {
+                        html += '<div class="page-num" onclick="changePage(' + (currentPage - 1) + ')">&lt;</div>';
+                    }
+
+                    for (var i = 1; i <= total; i++) {
+                        var activeClass = (i === currentPage) ? "active" : "";
+                        html += '<div class="page-num ' + activeClass + '" onclick="changePage(' + i + ')">' + i + '</div>';
+                    }
+
+                    // 下一頁
+                    if (currentPage < total) {
+                        html += '<div class="page-num" onclick="changePage(' + (currentPage + 1) + ')">&gt;</div>';
+                    }
+
+                    pageBox.innerHTML = html;
+                });
             }
 
-            var html = "";
-            displayData.forEach(function(r){
-                var userStars = "";
-                for(var s=1; s<=5; s++) userStars += (s <= r.rating) ? "★" : "☆";
-                html += '<div class="card" style="margin-bottom:15px;">' +
-                '<div style="display:flex; justify-content:space-between;">' +
-                '<strong>'+r.userName+'</strong><span style="color:#888;">'+r.date+'</span></div>' +
-                '<div style="color:#e2b007;">'+userStars+'</div>' +
-                '<p style="margin-top:8px; color:#555; line-height:1.5;">'+r.content+'</p>' + 
-                '</div>';
-            });
-            document.getElementById("commentList").innerHTML = html || "<p>尚無評論</p>";
-            renderPagination(totalPages);
-        }
 
         function renderPagination(total) {
             var container = document.querySelector('.pagination');
@@ -241,17 +282,49 @@
         }
 
         function submitReview() {
-            var newReview = {
-                pid: pid,
-            };
-            var reviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
-            reviews.unshift(newReview);
-            localStorage.setItem('tt_reviews', JSON.stringify(reviews));
-            alert("評論已送出！");
-            document.getElementById('userReview').value = "";
-            currentPage = 1; 
-            loadReviews();
+            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+            if (!user) {
+                alert("請先登入會員再評論！");
+                location.href = "login.html";
+                return;
+            }
+
+            var content = document.getElementById('userReview').value.trim();
+            if (!content) {
+                alert("請輸入評論內容");
+                return;
+            }
+
+            fetch(API_BASE + "/Reviews", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    productId: parseInt(pid),
+                    userId: user.id,
+                    userName: user.name,
+                    rating: currentRating,  // 你原本的星星選取分數
+                    content: content
+                })
+            })
+            .then(function (res) {
+                if (!res.ok) return res.json().then(function (err) { throw err; });
+                return res.json();
+            })
+            .then(function () {
+                alert("評論已送出！");
+                // ✅ 清空輸入框
+                document.getElementById('userReview').value = "";
+                // ✅ 回到第一頁（通常最新評論排在最上面）
+                currentPage = 1;
+                // ✅ 重新向後端抓評論並更新畫面
+                loadReviews();
+            })
+            .catch(function (err) {
+                alert(err.message || "評論送出失敗");
+            });
         }
+
+
 
 
         function submitReview() {

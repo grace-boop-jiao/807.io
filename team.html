@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>關於我們 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* 團隊與品牌專用樣式 */
         .brand-intro-title, .team-intro-title {
@@ -85,19 +85,24 @@
 <body>
     <div class="marquee-container">✨ 認識我們的團隊 ✨ 致力於為您提供最優質的甜點體驗 ✨</div>
     <header>
-        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
-        <div class="search-bar">
-            <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
-            <button onclick="siteSearch()">搜尋</button>
-            <div id="searchSuggestions" class="search-suggestions"></div>
+        <div class="logo" onclick="location.href='index.html'">
+            <img src="images/Logo.PNG" alt="Logo">
+            Treat Trader
         </div>
+
+        <nav class="main-nav">
+            <a href="index.html">首頁</a>
+            <a href="allgoods.html">商品總覽</a>
+            <a href="member.html">會員資料</a>
+            <a href="team.html">關於我們</a>
+        </nav>
+
         <div class="header-icons">
             <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
             <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
         </div>
     </header>
-    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
-
+    
     <div class="container">
         <h2 class="brand-intro-title">品牌介紹</h2>
         <div class="card" style="margin-bottom: 40px; text-align: center;">
@@ -142,12 +147,16 @@
 
     <footer>
         <div class="footer-socials">
-            <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-            <a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a>
-            <a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a>
+            <a href="https://reurl.cc/xKA8ae" target="_blank">
+                <i class="fa-brands fa-instagram"></i></a>
+            <a href="https://reurl.cc/Vmlo9A" target="_blank">
+                <i class="fa-brands fa-threads"></i></a>
+            <a href="https://reurl.cc/9ba94j" target="_blank">
+                <i class="fa-brands fa-line"></i></a>
+            <a href="mailto:service@example.com">
+                <i class="fa-solid fa-envelope"></i></a>
         </div>
-        <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
+        <div class="footer-links"><a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
 
