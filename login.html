@@ -7,27 +7,64 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .login-container { height: 100%; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-box { background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; }
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr !important; } }
+        .login-container {
+            height: 100%;
+        }
+        
+        /* 彈窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="marquee-container">✨ 官網限定：註冊新會員立即享 100 元折價券 ✨</div>
+    <div class="marquee-container">✨ 官網限定：註冊新會員立即享 50 元折價券 ✨</div>
+    
     <header>
         <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
+        
         <div class="search-bar">
             <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
             <button onclick="siteSearch()">搜尋</button>
             <div id="searchSuggestions" class="search-suggestions"></div>
         </div>
+
         <div class="header-icons">
             <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
             <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
         </div>
     </header>
-    <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
+
+    <nav class="main-nav">
+        <a href="index.html">首頁</a>
+        <a href="allgoods.html">商品總覽</a>
+        <a href="member.html">會員資料</a>
+        <a href="team.html">關於我們</a>
+    </nav>
 
     <div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
         <div class="card login-container">
@@ -35,10 +72,13 @@
             <form style="margin-top: 20px;" onsubmit="handleLogin(event)">
                 <input type="email" id="loginEmail" placeholder="帳號 (Email)" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px;">
                 <input type="password" id="loginPwd" placeholder="密碼" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px;">
-                <div style="text-align:right; margin-bottom:15px;"><a href="#" onclick="showForgetModal()" style="color:#FF7F50; font-size:0.9rem;">忘記密碼？</a></div>
+                <div style="text-align:right; margin-bottom:15px;">
+                    <a href="#" onclick="showForgetModal()" style="color:#FF7F50; font-size:0.9rem;">忘記密碼？</a>
+                </div>
                 <button class="btn" style="width:100%; font-size:1.1rem;">登入</button>
             </form>
         </div>
+
         <div class="card login-container">
             <h2>新會員註冊</h2>
             <form style="margin-top: 20px;" onsubmit="handleRegister(event)">
@@ -67,12 +107,14 @@
     <footer>
         <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
-        <p class="copyright">© COPYRIGHT 807dorm</p>
+        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
         window.onload = function() {
-            if(!localStorage.getItem('tt_users')) localStorage.setItem('tt_users', JSON.stringify([]));
+            if(!localStorage.getItem('tt_users')) {
+                localStorage.setItem('tt_users', JSON.stringify([]));
+            }
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
             if(user) document.getElementById('avatarLink').href = "member.html";
         };
@@ -83,56 +125,82 @@
             var phone = document.getElementById('regPhone').value;
             var email = document.getElementById('regEmail').value;
             var pwd = document.getElementById('regPwd').value;
+
             var users = JSON.parse(localStorage.getItem('tt_users'));
-            if(users.find(function(u){ return u.email === email; })) { alert("此 Email 已經註冊過了！"); return; }
+            var exist = users.find(function(u){ return u.email === email; });
+            
+            if(exist) {
+                alert("此 Email 已經註冊過了！");
+                return;
+            }
+
             var newUser = { name: name, phone: phone, email: email, pwd: pwd, id: Date.now() };
             users.push(newUser);
             localStorage.setItem('tt_users', JSON.stringify(users));
+            
             localStorage.setItem('tt_currentUser', JSON.stringify(newUser));
-            alert("註冊成功！"); location.href = 'member.html';
+            alert("註冊成功！");
+            location.href = 'member.html';
         }
 
         function handleLogin(e) {
             e.preventDefault();
             var email = document.getElementById('loginEmail').value;
             var pwd = document.getElementById('loginPwd').value;
+            
             var users = JSON.parse(localStorage.getItem('tt_users'));
             var user = users.find(function(u){ return u.email === email && u.pwd === pwd; });
+
             if(user) {
                 localStorage.setItem('tt_currentUser', JSON.stringify(user));
-                alert("登入成功！"); location.href = 'member.html';
-            } else { alert("帳號或密碼錯誤！"); }
+                alert("登入成功！");
+                location.href = 'member.html';
+            } else {
+                alert("帳號或密碼錯誤！");
+            }
         }
 
         function showForgetModal() { document.getElementById('forgetModal').style.display = 'flex'; }
         function closeForgetModal() { document.getElementById('forgetModal').style.display = 'none'; }
+        
         function confirmForget() {
             var email = document.getElementById('forgetEmail').value;
             var phone = document.getElementById('forgetPhone').value;
             if(!email || !phone) { alert("請填寫所有欄位！"); return; }
-            alert('已寄送重設連結至 ' + email); closeForgetModal();
+            alert('已寄送重設連結至 ' + email);
+            closeForgetModal();
         }
 
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        
         function siteSearch() {
             var val = document.getElementById('globalSearch').value.trim();
             if(!val) return;
             fetch('products.json').then(function(r){ return r.json() }).then(function(data){
                 var matches = data.filter(function(p){ return p.name.includes(val); });
-                if(matches.length === 0) alert("沒有搜尋到相關商品！");
-                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
+                if(matches.length === 0) {
+                    alert("沒有搜尋到相關商品！");
+                } else {
+                    location.href = "allgoods.html?search=" + encodeURIComponent(val);
+                }
             });
         }
+
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');
             if(val.length < 1) { box.style.display = 'none'; return; }
+
             fetch('products.json').then(function(r){ return r.json() }).then(function(data){
                 var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
                 if(matches.length > 0) {
-                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
+                    box.innerHTML = matches.map(function(p){
+                        return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">' + p.name + '</div>';
+                    }).join('');
                     box.style.display = 'block';
-                } else { box.style.display = 'none'; }
+                } else {
+                    box.style.display = 'none';
+                }
             });
         }
     </script>

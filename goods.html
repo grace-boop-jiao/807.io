@@ -22,6 +22,10 @@
         .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .page-num { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #ddd; cursor: pointer; }
         .page-num.active { background: #FF7F50; color: white; border-color: #FF7F50; }
+        .pagination {display: flex;justify-content: center;gap: 8px;margin-top: 20px;}
+        .page-num {padding: 5px 12px;border: 1px solid #ddd;border-radius: 4px;cursor: pointer;user-select: none;}
+        .page-num.active {background-color: #5C4033; /* 你的主色調 */color: white;border-color: #5C4033;}
+        .page-num:hover:not(.active) {background-color: #f0f0f0;}
         
         @media (max-width: 768px) { .product-main { grid-template-columns: 1fr; } }
     </style>
@@ -96,6 +100,8 @@
         var pid = urlParams.get('id') || '1';
         var currentProduct = null;
         var currentRating = 5;
+        var currentPage = 1; 
+        var reviewsPerPage = 2;
 
         window.onload = function() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
@@ -111,6 +117,7 @@
                 starCont.style.opacity = '0.5';
             }
             setRating(5);
+            initFakeData();
         };
 
         fetch('products.json')
@@ -157,10 +164,19 @@
             }
         }
 
+
+       
+
+
         function loadReviews() {
             var allReviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
             var pReviews = allReviews.filter(function(r){ return r.pid == pid; });
-            
+            var totalPages = Math.ceil(pReviews.length / reviewsPerPage);
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            var start = (currentPage - 1) * reviewsPerPage;
+            var end = start + reviewsPerPage;
+            var displayData = pReviews.slice(start, end);
             // 計算並更新上方總評分
             if (pReviews.length > 0) {
                 var sum = pReviews.reduce(function(a, b){ return a + b.rating; }, 0);
@@ -175,11 +191,62 @@
             }
 
             var html = "";
-            pReviews.forEach(function(r){
-                html += '<div class="card" style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong>'+r.userName+'</strong><span style="color:#888; font-size:0.9rem;">'+r.date+'</span></div><div style="color:#e2b007; margin-bottom:5px;">'+'★'.repeat(r.rating)+'</div><p>'+r.content+'</p></div>';
+            displayData.forEach(function(r){
+                var userStars = "";
+                for(var s=1; s<=5; s++) userStars += (s <= r.rating) ? "★" : "☆";
+                html += '<div class="card" style="margin-bottom:15px;">' +
+                '<div style="display:flex; justify-content:space-between;">' +
+                '<strong>'+r.userName+'</strong><span style="color:#888;">'+r.date+'</span></div>' +
+                '<div style="color:#e2b007;">'+userStars+'</div>' +
+                '<p style="margin-top:8px; color:#555; line-height:1.5;">'+r.content+'</p>' + 
+                '</div>';
             });
-            document.getElementById("commentList").innerHTML = html || "<p>尚無評論，成為第一個評論的人！</p>";
+            document.getElementById("commentList").innerHTML = html || "<p>尚無評論</p>";
+            renderPagination(totalPages);
         }
+
+        function renderPagination(total) {
+            var container = document.querySelector('.pagination');
+            if(!container || total <= 1) { 
+                if(container) container.innerHTML = ""; 
+                return; 
+        }
+
+            var html = "";
+            // 上一頁
+            if(currentPage > 1) html += '<div class="page-num" onclick="changePage('+(currentPage-1)+')"> < </div>';
+            
+            // 數字頁碼
+            for(var i=1; i<=total; i++) {
+                var activeClass = (i === currentPage) ? "active" : "";
+                html += '<div class="page-num '+activeClass+'" onclick="changePage('+i+')">'+i+'</div>';
+            }
+
+            // 下一頁
+            if(currentPage < total) html += '<div class="page-num" onclick="changePage('+(currentPage+1)+')"> > </div>';
+            
+            container.innerHTML = html;
+        }
+
+        // 換頁動作
+        function changePage(page) {
+            currentPage = page;
+            loadReviews(); 
+        }
+
+        function submitReview() {
+            var newReview = {
+                pid: pid,
+            };
+            var reviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
+            reviews.unshift(newReview);
+            localStorage.setItem('tt_reviews', JSON.stringify(reviews));
+            alert("評論已送出！");
+            document.getElementById('userReview').value = "";
+            currentPage = 1; 
+            loadReviews();
+        }
+
 
         function submitReview() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
@@ -226,6 +293,24 @@
                 } else { box.style.display = 'none'; }
             });
         }
+
+        function initFakeData(){
+            var reviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
+            var pReviews = reviews.filter(function(r){ return r.pid == pid; });
+            if (pReviews.length === 0) {
+                var fakeData = [
+                    { pid: pid, userName: "王小明", rating: 5, date: "2024/01/20", content: "出貨速度超級快，包裝也很完整，商品質感比想像中好很多！下次一定會再回購，大推！" },
+                    { pid: pid, userName: "陳美麗", rating: 4, date: "2024/01/18", content: "整體來說很滿意，但是物流稍微慢了一點點，扣一顆星。商品本身沒問題，很好用。" },
+                    { pid: pid, userName: "林大衛", rating: 5, date: "2024/01/15", content: "這是我買過最棒的產品了，解決了我長久以來的困擾。客服人員也非常親切有耐心。" },
+                    { pid: pid, userName: "Jessica", rating: 3, date: "2024/01/10", content: "跟圖片有一點點色差，不過還可以接受。希望能加強說明顏色的部分。" },
+                    { pid: pid, userName: "阿強", rating: 5, date: "2024/01/05", content: "幫家人買的，他們都很喜歡，操作簡單容易上手，價格也很實惠。" }
+            ];
+            reviews = reviews.concat(fakeData);
+            localStorage.setItem('tt_reviews', JSON.stringify(reviews));
+            console.log("已自動產生 5 筆測試評論！");
+        }
+    }
+
     </script>
 </body>
 </html>

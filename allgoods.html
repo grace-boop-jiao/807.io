@@ -43,7 +43,7 @@
     </style>
 </head>
 <body>
-    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
+    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
         <div class="search-bar">
@@ -98,8 +98,8 @@
             var allReviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
             var productReviews = allReviews.filter(function(r){ return r.pid == pid; });
             
-            // 預設假分數邏輯 (如果沒有評論，給個預設值好看一點，或者回傳 0)
-            if(productReviews.length === 0) return 4.5; 
+            
+            if(productReviews.length === 0) return 0; 
 
             var sum = productReviews.reduce(function(a, b){ return a + b.rating; }, 0);
             return (sum / productReviews.length).toFixed(1);
@@ -130,7 +130,7 @@
                 return; // 停止執行後面的 map，不然會報錯
             }
 
-            // 若有資料，正常顯示商品們
+            // 若有資料，正常顯示商品
             container.innerHTML = data.map(function(p) {
                 var rating = calculateAvgRating(p.id);
                 return '<div class="card product-card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
