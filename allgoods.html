@@ -6,6 +6,41 @@
     <title>商品總覽 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-card {
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .img-placeholder {
+            height: 150px;
+            background: #eee;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+        .rating-stars {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .rating-stars .active {
+            color: #e2b007;
+        }
+    </style>
 </head>
 <body>
     <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
@@ -25,7 +60,7 @@
 
     <div class="container">
         <h2>全部商品</h2>
-        <div id="productList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;"></div>
+        <div id="productList" class="product-grid"></div>
     </div>
 
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
@@ -33,37 +68,66 @@
     <footer>
         <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
-        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+        <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
         window.onload = function() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
             if(user) document.getElementById('avatarLink').href = "member.html";
+            fetchData();
         };
 
         var urlParams = new URLSearchParams(window.location.search);
         var searchKey = urlParams.get('search');
 
-        fetch('products.json')
-            .then(function(res){ return res.json(); })
-            .then(function(data){
-                var displayData = data;
-                if(searchKey) {
-                    displayData = data.filter(function(p){ return p.name.includes(searchKey); });
-                    document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
-                }
-                
-                document.getElementById("productList").innerHTML = displayData.map(function(p) {
-                    return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;">' +
-                           '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#888;">'+p.name+'</div>' +
-                           '<h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
-                           '</div>';
-                }).join("");
-            });
+        function fetchData() {
+            fetch('products.json')
+                .then(function(res){ return res.json(); })
+                .then(function(data){
+                    var displayData = data;
+                    if(searchKey) {
+                        displayData = data.filter(function(p){ return p.name.includes(searchKey); });
+                        document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
+                    }
+                    renderList(displayData);
+                });
+        }
+
+        function calculateAvgRating(pid) {
+            var allReviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
+            var productReviews = allReviews.filter(function(r){ return r.pid == pid; });
+            
+            // 預設假分數邏輯 (如果沒有評論，給個預設值好看一點，或者回傳 0)
+            if(productReviews.length === 0) return 4.5; 
+
+            var sum = productReviews.reduce(function(a, b){ return a + b.rating; }, 0);
+            return (sum / productReviews.length).toFixed(1);
+        }
+
+        function renderStars(rating) {
+            var html = "";
+            for(var i=1; i<=5; i++) {
+                if(i <= Math.round(rating)) html += '<i class="fa-solid fa-star active"></i>';
+                else html += '<i class="fa-solid fa-star"></i>';
+            }
+            return html + ' <span style="color:#555;">(' + rating + ')</span>';
+        }
+
+        function renderList(data) {
+            var container = document.getElementById("productList");
+            container.innerHTML = data.map(function(p) {
+                var rating = calculateAvgRating(p.id);
+                return '<div class="card product-card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
+                       '<div class="img-placeholder">'+p.name+'</div>' +
+                       '<h4>' + p.name + '</h4>' +
+                       '<p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
+                       '<div class="rating-stars">' + renderStars(rating) + '</div>' +
+                       '</div>';
+            }).join("");
+        }
 
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
-        
         function siteSearch() {
             var val = document.getElementById('globalSearch').value.trim();
             if(!val) return;
@@ -73,7 +137,6 @@
                 else location.href = "allgoods.html?search=" + encodeURIComponent(val);
             });
         }
-        
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');

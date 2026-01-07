@@ -6,6 +6,18 @@
     <title>Treat Trader - 首頁</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero-slider { height: 400px; background: #FFE4B5; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; cursor: pointer; color: #5C4033; text-align: center; padding: 0 20px; transition: transform 0.2s; position: relative; }
+        .hero-slider:hover { transform: scale(1.01); }
+        .slide-content { font-size: 2.5rem; font-weight: bold; background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; animation: fadeText 3s infinite alternate; }
+        @keyframes fadeText { from { opacity: 0.8; } to { opacity: 1; } }
+        .mid-filter { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .filter-left { display: flex; flex: 1; min-width: 250px; }
+        .filter-left input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px 0 0 5px; border-right: none; outline: none; }
+        .filter-left button { border-radius: 0 5px 5px 0; padding: 10px 20px; }
+        .filter-right { flex: 0.5; min-width: 200px; }
+        .filter-right select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; outline: none; cursor: pointer; }
+    </style>
 </head>
 <body>
     <div class="marquee-container">✨ Treat Trader 新年回饋祭：各國零食滿 $2500 免運！ ✨</div>
@@ -52,12 +64,7 @@
     <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
 
     <footer>
-        <div class="footer-socials">
-            <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-            <a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a>
-            <a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a>
-        </div>
+        <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
@@ -69,20 +76,15 @@
         };
 
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
-        
         function siteSearch() {
             var val = document.getElementById('globalSearch').value.trim();
             if(!val) return;
             fetch('products.json').then(function(r){ return r.json() }).then(function(data){
                 var matches = data.filter(function(p){ return p.name.includes(val); });
-                if(matches.length === 0) {
-                    alert("沒有搜尋到相關商品！");
-                } else {
-                    location.href = "allgoods.html?search=" + encodeURIComponent(val);
-                }
+                if(matches.length === 0) alert("沒有搜尋到相關商品！");
+                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
             });
         }
-
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');
@@ -96,51 +98,24 @@
             });
         }
 
-        var ads = [
-            { text: "🇯🇵 日本抹茶蛋糕：第二件半價 (點擊查看)", id: 1 },
-            { text: "🇫🇷 法國馬卡龍：浪漫直送到家 (點擊查看)", id: 3 },
-            { text: "🇺🇸 紐約起司蛋糕：濃郁登場 (點擊查看)", id: 7 }
-        ];
-        var adIdx = 0;
-        var currentAdId = 1;
-        
-        function updateAd() {
-            document.getElementById("heroText").innerText = ads[adIdx].text;
-            currentAdId = ads[adIdx].id;
-            adIdx = (adIdx + 1) % ads.length;
-        }
-        updateAd();
-        setInterval(updateAd, 5000);
-
-        function clickAd() {
-            location.href = "goods.html?id=" + currentAdId;
-        }
+        var ads = [{ text: "🇯🇵 日本抹茶蛋糕：第二件半價 (點擊查看)", id: 1 }, { text: "🇫🇷 法國馬卡龍：浪漫直送到家 (點擊查看)", id: 3 }, { text: "🇺🇸 紐約起司蛋糕：濃郁登場 (點擊查看)", id: 7 }];
+        var adIdx = 0; var currentAdId = 1;
+        function updateAd() { document.getElementById("heroText").innerText = ads[adIdx].text; currentAdId = ads[adIdx].id; adIdx = (adIdx + 1) % ads.length; }
+        updateAd(); setInterval(updateAd, 5000);
+        function clickAd() { location.href = "goods.html?id=" + currentAdId; }
 
         var allData = [];
-        fetch('products.json')
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                allData = data;
-                renderProducts(data.slice(0, 8));
-            });
-
+        fetch('products.json').then(function(res) { return res.json(); }).then(function(data) { allData = data; renderProducts(data.slice(0, 8)); });
         function renderProducts(list) {
             document.getElementById("recommendList").innerHTML = list.map(function(p){
-                return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;">' +
-                       '<div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#888;">'+p.name+'</div>' +
-                       '<h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
-                       '</div>';
+                return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;"><div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#888;">'+p.name+'</div><h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p></div>';
             }).join("");
         }
-
         function handleEnterFilter(e) { if(e.key === 'Enter') filterProducts(); }
-        
         function filterProducts() {
             var key = document.getElementById("midSearch").value.toLowerCase();
             var cat = document.getElementById("midCategory").value;
-            var filtered = allData.filter(function(p){ 
-                return (cat === "all" || p.category === cat) && p.name.toLowerCase().includes(key); 
-            });
+            var filtered = allData.filter(function(p){ return (cat === "all" || p.category === cat) && p.name.toLowerCase().includes(key); });
             renderProducts(filtered);
         }
     </script>

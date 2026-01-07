@@ -6,6 +6,16 @@
     <title>會員中心 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .member-layout { display: grid; grid-template-columns: 280px 1fr; gap: 30px; }
+        .member-section-title { font-size: 1.5rem; font-weight: bold; color: #5C4033; margin-bottom: 15px; border-bottom: 2px solid #FFECB3; padding-bottom: 10px; }
+        .progress-container { background: #FFE4B5; border-radius: 10px; height: 12px; width: 100%; margin: 10px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: #FF7F50; width: 0%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #FFECB3; padding: 10px; text-align: left; }
+        th { background: #FFECB3; }
+        @media (max-width: 768px) { .member-layout { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
     <div class="marquee-container">✨ 歡迎回來！查看您的專屬優惠與訂單進度 ✨</div>
@@ -58,9 +68,7 @@
 
                 <div class="card">
                     <h2 class="member-section-title">我的評論紀錄</h2>
-                    <div id="myReviews">
-                        <p>尚無評論紀錄。</p>
-                    </div>
+                    <div id="myReviews"><p>尚無評論紀錄。</p></div>
                 </div>
             </div>
         </div>
@@ -71,41 +79,34 @@
     <footer>
         <div class="footer-socials"><a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a><a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook"></i></a><a href="https://line.me" target="_blank"><i class="fa-brands fa-line"></i></a><a href="mailto:service@example.com"><i class="fa-solid fa-envelope"></i></a></div>
         <div class="footer-links"><span>聯繫方式</span> | <a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
-        <p class="copyright">&copy; COPYRIGHT 807dorm</p>
+        <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
 
     <script>
-        var user = JSON.parse(localStorage.getItem('tt_currentUser'));
-        if(!user) {
-            alert("請先登入！");
-            window.location.href = 'login.html';
-        } else {
-            document.getElementById('mName').innerText = user.name;
-            document.getElementById('mEmail').innerText = user.email;
-            document.getElementById('mPhone').innerText = user.phone;
-            document.getElementById('avatarLink').href = "member.html";
-            loadMyReviews(user.email);
-        }
+        window.onload = function() {
+            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+            if(!user) { alert("請先登入！"); window.location.href = 'login.html'; }
+            else {
+                document.getElementById('mName').innerText = user.name;
+                document.getElementById('mEmail').innerText = user.email;
+                document.getElementById('mPhone').innerText = user.phone;
+                document.getElementById('avatarLink').href = "member.html";
+                loadMyReviews(user.email);
+            }
+        };
 
         function logout() {
             localStorage.removeItem('tt_currentUser');
-            alert("已登出");
-            window.location.href = 'login.html';
+            alert("已登出"); window.location.href = 'login.html';
         }
 
         function loadMyReviews(email) {
             var reviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
             var myReviews = reviews.filter(function(r){ return r.userId === email; });
-            
             if(myReviews.length > 0) {
                 var html = "<table><tr><th>商品</th><th>評分</th><th>內容</th><th>日期</th></tr>";
                 myReviews.forEach(function(r){
-                    html += "<tr>" +
-                            "<td><a href='goods.html?id="+r.pid+"' style='color:#FF7F50;'>"+r.pName+"</a></td>" +
-                            "<td>"+r.rating+"★</td>" +
-                            "<td>"+r.content+"</td>" +
-                            "<td>"+r.date+"</td>" +
-                            "</tr>";
+                    html += "<tr><td><a href='goods.html?id="+r.pid+"' style='color:#FF7F50;'>"+r.pName+"</a></td><td>"+r.rating+"★</td><td>"+r.content+"</td><td>"+r.date+"</td></tr>";
                 });
                 html += "</table>";
                 document.getElementById('myReviews').innerHTML = html;
@@ -113,7 +114,6 @@
         }
 
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
-        
         function siteSearch() {
             var val = document.getElementById('globalSearch').value.trim();
             if(!val) return;
@@ -123,7 +123,6 @@
                 else location.href = "allgoods.html?search=" + encodeURIComponent(val);
             });
         }
-        
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');

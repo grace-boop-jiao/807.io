@@ -6,6 +6,81 @@
     <title>關於我們 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 團隊與品牌專用樣式 */
+        .brand-intro-title, .team-intro-title {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5C4033;
+            border-left: 5px solid #FF7F50;
+            padding-left: 15px;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .team-card {
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+        .team-card:nth-child(1) { background: #FFD2A6; }
+        .team-card:nth-child(2) { background: #FFC1A1; }
+        .team-card:nth-child(3) { background: #FFECB3; }
+        .team-card:nth-child(4) { background: #FFD2A6; }
+
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #fff;
+            margin-bottom: 15px;
+            border: 3px solid rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+        .brand-logo-place {
+            width: 150px;
+            height: 150px;
+            background: #FFD2A6;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #5C4033;
+        }
+        .brand-intro-box {
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1rem;
+            color: #444;
+        }
+        
+        /* RWD */
+        @media (max-width: 992px) {
+            .team-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 576px) {
+            .team-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <div class="marquee-container">✨ 認識我們的團隊 ✨ 致力於為您提供最優質的甜點體驗 ✨</div>
@@ -26,7 +101,7 @@
     <div class="container">
         <h2 class="brand-intro-title">品牌介紹</h2>
         <div class="card" style="margin-bottom: 40px; text-align: center;">
-            <div class="brand-logo-place">Logo 照片</div>
+            <div class="brand-logo-place">Logo</div>
             
             <h1 style="margin-bottom: 20px; font-size: 1.8rem; color: #FF7F50;">賣國賊 (Treat Trader)</h1>
             <div class="brand-intro-box">
@@ -41,22 +116,22 @@
         <h2 class="brand-intro-title">組員介紹</h2>
         <div class="team-grid">
             <div class="team-card">
-                <div class="member-avatar"></div>
+                <div class="member-avatar">Avatar</div>
                 <h3>資管二甲 李妍庭</h3>
                 <p>學到會員系統設計與前端美化，對色彩搭配更有概念。</p>
             </div>
             <div class="team-card">
-                <div class="member-avatar"></div>
+                <div class="member-avatar">Avatar</div>
                 <h3>資官二甲 丁聖曦</h3>
                 <p>學會黑黃配色與網頁排版技巧，了解用色影響用戶體驗。</p>
             </div>
             <div class="team-card">
-                <div class="member-avatar"></div>
+                <div class="member-avatar">Avatar</div>
                 <h3>資管二甲 焦紫菱</h3>
                 <p>熟悉卡片化排版與表格設計，對長條式排版掌握更好。</p>
             </div>
             <div class="team-card">
-                <div class="member-avatar"></div>
+                <div class="member-avatar">Avatar</div>
                 <h3>資管二甲 張庭瑀</h3>
                 <p>前端互動與會員資料整合實務經驗，掌握卡片長條排版。</p>
             </div>

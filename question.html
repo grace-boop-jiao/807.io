@@ -6,6 +6,40 @@
     <title>常見問題 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 常見問題專用樣式 */
+        .accordion-item {
+            border-bottom: 1px solid #FFD2A6;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .accordion-header {
+            padding: 15px;
+            background: #FFD2A6;
+            color: #5C4033;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .accordion-header:hover {
+            background: #ffcba4;
+        }
+        .accordion-content {
+            padding: 20px;
+            display: none;
+            background: #FFF8E7;
+            color: #333;
+            line-height: 1.6;
+            border-left: 3px solid #FFD2A6;
+        }
+        .accordion-content.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="marquee-container">✨ 疑難雜症看這裡，快速解決您的問題 ✨</div>
@@ -72,6 +106,7 @@
             span.innerText = content.classList.contains('active') ? '-' : '+';
         }
 
+        // Header Search Logic
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
         
         function siteSearch() {

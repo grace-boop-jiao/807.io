@@ -6,6 +6,28 @@
     <title>幫助中心 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 幫助中心表單樣式 */
+        .help-form input, 
+        .help-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-family: inherit;
+        }
+        .help-form textarea {
+            resize: vertical;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #5C4033;
+        }
+    </style>
 </head>
 <body>
     <div class="marquee-container">✨ 我們樂意為您服務，請留下您的寶貴意見 ✨</div>
@@ -26,18 +48,18 @@
     <div class="container" style="max-width: 800px;">
         <div class="card">
             <h2 style="text-align: center; margin-bottom: 20px;">幫助中心</h2>
-            <form onsubmit="alert('感謝您的回饋，我們會盡快回覆！'); this.reset(); event.preventDefault();">
-                <div style="margin-bottom:15px;">
+            <form class="help-form" onsubmit="alert('感謝您的回饋，我們會盡快回覆！'); this.reset(); event.preventDefault();">
+                <div class="form-group">
                     <label>姓名</label>
-                    <input type="text" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                    <input type="text" required placeholder="請輸入您的姓名">
                 </div>
-                <div style="margin-bottom:15px;">
+                <div class="form-group">
                     <label>Email</label>
-                    <input type="email" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                    <input type="email" required placeholder="請輸入您的聯絡信箱">
                 </div>
-                <div style="margin-bottom:15px;">
+                <div class="form-group">
                     <label>問題或建議</label>
-                    <textarea required style="width:100%; height:150px; padding:10px; border:1px solid #ccc; border-radius:5px; margin-top:5px;"></textarea>
+                    <textarea required style="height:150px;" placeholder="請描述您遇到的問題或建議..."></textarea>
                 </div>
                 <button class="btn" style="width:100%;">送出</button>
             </form>
