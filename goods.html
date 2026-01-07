@@ -143,7 +143,11 @@
         function loadRecs(all) {
             var recs = all.filter(function(p){ return p.id != pid; }).slice(0, 4);
             document.getElementById("recList").innerHTML = recs.map(function(p){
-                return '<div class="card" style="text-align:center; cursor:pointer;" onclick="location.href=\'goods.html?id='+p.id+'\'"><div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px;"></div><h4>'+p.name+'</h4><p style="color:#FF7F50; font-weight:bold;">$'+p.price+'</p></div>';
+                var recImgPath = "images/" + p.img ;
+                return '<div class="card" style="text-align:center; cursor:pointer;" onclick="location.href=\'goods.html?id='+p.id+'\'">'+
+                    '<div style="height:150px; margin-bottom:10px; overflow:hidden; border-radius:10px; background:#f9f9f9;">' +
+                    '<img src="' + recImgPath + '" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display=\'none\'">' + '</div>'+ 
+                    '<h4>' + p.name + '</h4>' +'<p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +'</div>';
             }).join('');
         }
 

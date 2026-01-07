@@ -146,11 +146,29 @@ nav.main-nav a:hover {
     min-height: 60vh;
 }
 
+/* --- card (class) --- */
+/*--- DO NOT MOVE!!!!! ---*/
 .card {
     background: white;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.img-placeholder {
+    height: 150px;
+    width: 100%;
+    max-width: 180px;
+    background: #eee;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.8rem;
+    padding: 10px;
+    overflow: hidden;
 }
 
 .btn {

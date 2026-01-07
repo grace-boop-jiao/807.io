@@ -21,18 +21,26 @@
 </head>
 <body>
     <div class="marquee-container">✨ Treat Trader 新年回饋祭：各國零食滿 $2500 免運！ ✨</div>
+
     <header>
-        <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
-        <div class="search-bar">
-            <input type="text" id="globalSearch" placeholder="搜尋商品..." oninput="handleSearchInput(this)" onkeypress="handleEnter(event)">
-            <button onclick="siteSearch()">搜尋</button>
-            <div id="searchSuggestions" class="search-suggestions"></div>
+        <div class="logo" onclick="location.href='index.html'">
+            <img src="images/logo.png" alt="Logo" style="height: 30px; vertical-align: middle; margin-right: 8px;">
+            Treat Trader
         </div>
+
+        <nav class="main-nav">
+            <a href="index.html">首頁</a>
+            <a href="allgoods.html">商品總覽</a>
+            <a href="member.html">會員資料</a>
+            <a href="team.html">關於我們</a>
+        </nav>
+
         <div class="header-icons">
             <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
             <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
         </div>
     </header>
+
     <nav class="main-nav"><a href="index.html">首頁</a><a href="allgoods.html">商品總覽</a><a href="member.html">會員資料</a><a href="team.html">關於我們</a></nav>
 
     <div class="container">
@@ -82,8 +90,7 @@
         <div class="footer-links"><a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
         <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
-
-    <script>
+            <script>
         window.onload = function() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
             if(user) document.getElementById('avatarLink').href = "member.html";
@@ -99,6 +106,7 @@
                 else location.href = "allgoods.html?search=" + encodeURIComponent(val);
             });
         }
+
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');
@@ -112,6 +120,7 @@
             });
         }
 
+        // 廣告輪播
         var ads = [{ text: "🇯🇵 日本抹茶蛋糕：第二件半價 (點擊查看)", id: 1 }, { text: "🇫🇷 法國馬卡龍：浪漫直送到家 (點擊查看)", id: 3 }, { text: "🇺🇸 紐約起司蛋糕：濃郁登場 (點擊查看)", id: 7 }];
         var adIdx = 0; var currentAdId = 1;
         function updateAd() { document.getElementById("heroText").innerText = ads[adIdx].text; currentAdId = ads[adIdx].id; adIdx = (adIdx + 1) % ads.length; }
@@ -119,12 +128,37 @@
         function clickAd() { location.href = "goods.html?id=" + currentAdId; }
 
         var allData = [];
-        fetch('products.json').then(function(res) { return res.json(); }).then(function(data) { allData = data; renderProducts(data.slice(0, 8)); });
+        fetch('products.json').then(function(res) { return res.json(); }).then(function(data) { 
+            allData = data; 
+            renderProducts(data.slice(0, 8)); 
+        });
+
         function renderProducts(list) {
-            document.getElementById("recommendList").innerHTML = list.map(function(p){
-                return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'" style="cursor:pointer; text-align:center;"><div style="height:150px; background:#eee; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#888;">'+p.name+'</div><h4>' + p.name + '</h4><p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p></div>';
-            }).join("");
+        var container = document.getElementById("recommendList");
+            
+        // 空狀態提示
+        if (!list || list.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 15px;">
+                    <i class="fa-solid fa-cookie-bite" style="font-size: 4rem; color: #FFD2A6; margin-bottom: 20px;"></i>
+                    <h3 style="color: #5C4033;">喔喔！找不到相關商品</h3>
+                    <p style="color: #888; margin-bottom: 20px;">試試看其他關鍵字。</p>
+                    <button onclick="location.href='allgoods.html'" class="btn">查看所有商品</button>
+                </div>`;
+            return;
         }
+
+        // 渲染結構：與 goods.html 保持一致
+        container.innerHTML = list.map(function(p){
+            return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
+                   '<div class="img-placeholder">' + 
+                   '<img src="images/' + p.img + '" alt="' + p.name + '" style="width:100%; height:100%; object-fit:cover;">' + 
+                   '</div>' +
+                   '<h4>' + p.name + '</h4>' +
+                   '<p>$' + p.price + '</p></div>';
+        }).join("");
+    }
+
         function handleEnterFilter(e) { if(e.key === 'Enter') filterProducts(); }
         function filterProducts() {
             var key = document.getElementById("midSearch").value.toLowerCase();
@@ -132,6 +166,13 @@
             var filtered = allData.filter(function(p){ return (cat === "all" || p.category === cat) && p.name.toLowerCase().includes(key); });
             renderProducts(filtered);
         }
+
+        // 自動隱藏搜尋建議
+        document.addEventListener('click', function(e) {
+            var box = document.getElementById('searchSuggestions');
+            var input = document.getElementById('globalSearch');
+            if (box && input && e.target !== box && e.target !== input) { box.style.display = 'none'; }
+        });
     </script>
 </body>
 </html>
