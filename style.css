@@ -231,3 +231,21 @@ footer {
     .search-bar { order: 3; width: 100%; margin: 0; }
     .header-icons { gap: 15px; }
 }
+
+/* hover(important)--for index */
+#recommendList .card {
+    cursor: pointer !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+#recommendList .card:hover {
+    /* 使用 !important 強制壓過 JS 的 inline style */
+    transform: translateY(-8px) !important;
+    box-shadow: 0 12px 20px rgba(0,0,0,0.15) !important;
+    border: 1px solid #FF7F50 !important; /* 選配：加個橘色邊框 */
+}
+
+/* 針對卡片內的圖片預覽區 (那個灰色的 div) */
+#recommendList .card:hover div[style*="background:#eee"] {
+    background: #FFECB3 !important; /* 移上去時灰色變奶油黃 */
+}

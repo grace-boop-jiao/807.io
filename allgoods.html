@@ -99,7 +99,7 @@
             var productReviews = allReviews.filter(function(r){ return r.pid == pid; });
             
             
-            if(productReviews.length === 0) return 0; 
+            if(productReviews.length === 0) return 4.4; 
 
             var sum = productReviews.reduce(function(a, b){ return a + b.rating; }, 0);
             return (sum / productReviews.length).toFixed(1);
@@ -111,6 +111,10 @@
                 if(i <= Math.round(rating)) html += '<i class="fa-solid fa-star active"></i>';
                 else html += '<i class="fa-solid fa-star"></i>';
             }
+            if (rating == 0) {
+                return html + ' <span style="color:#aaa; font-size: 0.8rem;">(暫無評分)</span>';
+            }
+
             return html + ' <span style="color:#555;">(' + rating + ')</span>';
         }
 
