@@ -116,16 +116,42 @@
 
         function renderList(data) {
             var container = document.getElementById("productList");
+    
+            // 如果搜尋不到任何商品 (data 是空的)
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 15px;">
+                        <i class="fa-solid fa-cookie-bite" style="font-size: 4rem; color: #FFD2A6; margin-bottom: 20px;"></i>
+                        <h3 style="color: #5C4033;">喔喔！找不到相關商品</h3>
+                        <p style="color: #888; margin-bottom: 20px;">試試看其他關鍵字，或是看看我們的熱門推薦。</p>
+                        <button onclick="location.href='allgoods.html'" class="btn">查看所有商品</button>
+                    </div>
+                `;
+                return; // 停止執行後面的 map，不然會報錯
+            }
+
+            // 若有資料，正常顯示商品們
             container.innerHTML = data.map(function(p) {
                 var rating = calculateAvgRating(p.id);
                 return '<div class="card product-card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
-                       '<div class="img-placeholder">'+p.name+'</div>' +
+                       '<div class="img-placeholder">' + p.name + '</div>' +
                        '<h4>' + p.name + '</h4>' +
                        '<p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
-                       '<div class="rating-stars">' + renderStars(rating) + '</div>' +
-                       '</div>';
+                        '<div class="rating-stars">' + renderStars(rating) + '</div>' +
+                        '</div>';
             }).join("");
         }
+
+        // 偵測點擊了沒
+        document.addEventListener('click', function(e) {
+            var box = document.getElementById('searchSuggestions');
+            var input = document.getElementById('globalSearch');
+    
+            // 如果點沒點搜尋框/建議選單，把選單藏起來
+            if (e.target !== box && e.target !== input) {
+                box.style.display = 'none';
+            }
+        });
 
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
         function siteSearch() {
