@@ -6,7 +6,7 @@
         "category": "japan",
         "desc": "來自靜岡的濃郁抹茶香，口感綿密。",
         "nutrition": "熱量: 350大卡 | 蛋白質: 5g",
-        "img": "Matcha"
+        "img": "Matcha.jpg"
     },
     {
         "id": 2,
@@ -15,7 +15,7 @@
         "category": "usa",
         "desc": "美式經典，外酥內軟，巧克力豆爆漿。",
         "nutrition": "熱量: 450大卡 | 糖: 30g",
-        "img": "Cookie"
+        "img": "Cookie.jpg"
     },
     {
         "id": 3,
@@ -24,7 +24,7 @@
         "category": "france",
         "desc": "法式浪漫，甜而不膩，少女心爆發。",
         "nutrition": "熱量: 200大卡 | 糖: 40g",
-        "img": "Macaron"
+        "img": "Macaron.jpg"
     },
     {
         "id": 4,
@@ -33,7 +33,7 @@
         "category": "uk",
         "desc": "下午茶首選，優雅茶香。",
         "nutrition": "熱量: 150大卡 | 脂肪: 10g",
-        "img": "TeaBiscuit"
+        "img": "TeaBiscuit.jpg"
     },
     {
         "id": 5,
@@ -42,7 +42,7 @@
         "category": "korea",
         "desc": "鹹甜交織，起司控最愛。",
         "nutrition": "熱量: 300大卡 | 鈉: 200mg",
-        "img": "Cheese"
+        "img": "Cheese.jpg"
     },
     {
         "id": 6,
@@ -51,7 +51,7 @@
         "category": "japan",
         "desc": "北海道經典伴手禮。",
         "nutrition": "熱量: 250大卡 | 糖: 15g",
-        "img": "WhiteLover"
+        "img": "WhiteLover.jpg"
     },
     {
         "id": 7,
@@ -60,7 +60,7 @@
         "category": "usa",
         "desc": "重乳酪風味，濃郁化口。",
         "nutrition": "熱量: 400大卡 | 脂肪: 25g",
-        "img": "CheeseCake"
+        "img": "CheeseCake.jpg"
     },
     {
         "id": 8,
@@ -69,7 +69,7 @@
         "category": "france",
         "desc": "酸甜清爽，法式甜點代表。",
         "nutrition": "熱量: 220大卡 | 糖: 18g",
-        "img": "LemonTart"
+        "img": "LemonTart.jpg"
     },
     {
         "id": 9,
@@ -78,7 +78,7 @@
         "category": "germany",
         "desc": "酒漬櫻桃與巧克力的完美結合。",
         "nutrition": "熱量: 450大卡 | 酒精: 微量",
-        "img": "Cake"
+        "img": "Cake.jpg"
     },
     {
         "id": 10,
@@ -87,7 +87,7 @@
         "category": "italy",
         "desc": "帶我走，享受微醺的咖啡香。",
         "nutrition": "熱量: 380大卡 | 咖啡因: 有",
-        "img": "Tiramisu"
+        "img": "Tiramisu.jpg"
     },
     {
         "id": 11,
@@ -96,7 +96,7 @@
         "category": "belgium",
         "desc": "頂級可可，絲滑柔順。",
         "nutrition": "熱量: 550大卡 | 可可脂: 高",
-        "img": "Choco"
+        "img": "Choco.jpg"
     },
     {
         "id": 12,
@@ -105,6 +105,6 @@
         "category": "taiwan",
         "desc": "在地土鳳梨，酸甜適中。",
         "nutrition": "熱量: 180大卡 | 纖維: 2g",
-        "img": "Pineapple"
+        "img": "Pineapple.jpg"
     }
 ]

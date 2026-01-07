@@ -14,7 +14,6 @@ body {
     color: #5C4033;
     line-height: 1.6;
     position: relative;
-    padding-bottom: 60px;
 }
 
 /* --- 跑馬燈 --- */
@@ -178,10 +177,15 @@ nav.main-nav a:hover {
 
 /* --- Footer & Top --- */
 footer {
+    clear: both;
     background: #FFD2A6;
     padding: 40px 20px;
     text-align: center;
     margin-top: 50px;
+}
+
+.container {
+    overflow: hidden;
 }
 
 .footer-socials a {
@@ -245,7 +249,6 @@ footer {
     border: 1px solid #FF7F50 !important; /* 選配：加個橘色邊框 */
 }
 
-/* 針對卡片內的圖片預覽區 (那個灰色的 div) */
 #recommendList .card:hover div[style*="background:#eee"] {
     background: #FFECB3 !important; /* 移上去時灰色變奶油黃 */
 }
