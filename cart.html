@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>購物車 - SWEET TRADER</title>
+    <title>購物車 - Treat Trader</title>
     <link rel="stylesheet" href="style.css">
     <!-- 導入Font Awesome圖庫，用於網頁icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -102,38 +102,17 @@
             border-radius: 10px;
             background: #fff;
         }
-
-        /* 鎖定時的樣式 */
-        .form-section.locked .selection-group, 
-        .form-section.locked input {
-            pointer-events: none;
-            opacity: 0.7;
-            background: #f9f9f9;
-        }
         
         .section-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
         }
 
         .section-title {
             font-weight: bold;
             color: #FF7F50;
-        }
-
-        .btn-confirm {
-            padding: 4px 12px;
-            background: #5C4033;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .btn-confirm.cancel {
-            background: #FF6347;
+            font-size: 1.1rem;
         }
         
         /* 選項按鈕群組 (單選) */
@@ -171,9 +150,10 @@
             display: block;
         }
 
-        .container input[type="text"], 
-        .container input[type="tel"], 
-        .container input[type="email"] {
+        /* 輸入框樣式優化 - 限定在 checkout-container 內，避免影響 Header */
+        .checkout-container input[type="text"], 
+        .checkout-container input[type="tel"], 
+        .checkout-container input[type="email"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -182,16 +162,17 @@
             outline: none;
         }
 
-        .container input[type="text"]:focus, 
-        .container input[type="tel"]:focus, 
-        .container input[type="email"]:focus {
+        .checkout-container input[type="text"]:focus, 
+        .checkout-container input[type="tel"]:focus, 
+        .checkout-container input[type="email"]:focus {
             border-color: #FF7F50;
         }
 
+        /* 前往結帳 / 回到購物車 按鈕 */
         .btn-checkout-nav {
             width: 100%;
-            padding: 15px;
-            font-size: 1.2rem;
+            padding: 15px; /* 與送出按鈕一致 */
+            font-size: 1.2rem; /* 與送出按鈕一致 */
             border-radius: 10px;
             cursor: pointer;
             border: none;
@@ -213,6 +194,7 @@
             background: #5C4033;
         }
 
+        /* 送出訂單按鈕 */
         .btn-submit {
             width: 100%;
             padding: 15px;
@@ -234,7 +216,7 @@
             transform: translateY(-2px);
         }
 
-        /* Map 樣式 - Leaflet 需要較高的 z-index 以正確顯示控制項 */
+        /* Map 樣式 */
         #googleMap {
             width: 100%;
             height: 300px;
@@ -276,7 +258,7 @@
     </style>
 </head>
 <body>
-    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ✨</div>
+    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
     
     <header>
         <div class="logo" onclick="location.href='index.html'">Treat Trader</div>
@@ -321,7 +303,6 @@
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">收件資訊</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 <div>
                     <input type="text" placeholder="姓名">
@@ -333,7 +314,6 @@
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">付款方式</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 
                 <div class="selection-group" id="payGroup">
@@ -355,7 +335,6 @@
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">收貨方式</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 
                 <div class="selection-group" id="shipGroup">
@@ -381,7 +360,6 @@
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">開立發票</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 
                 <div class="selection-group" id="invGroup">
@@ -393,7 +371,9 @@
             </div>
 
             <div class="form-section">
-                <div class="section-header"><span class="section-title">訂單明細</span></div>
+                <div class="section-header">
+                    <span class="section-title">訂單明細</span>
+                </div>
                 <div id="checkoutItemsList"></div>
                 <div style="border-top: 1px solid #ddd; margin-top: 10px; padding-top: 5px; display:flex; justify-content:space-between;">
                     <span>運費</span><span>$60</span>
@@ -436,15 +416,12 @@
             initMap(); // 初始化地圖
         };
 
-        // 門市選擇按鈕功能 (更新版，支援移動地圖)
+        // 門市選擇按鈕功能
         function selectStore(name, lat, lng) {
             document.getElementById('storeNameInput').value = name;
             if(map && lat && lng) {
-                map.setView([lat, lng], 18); // 移動視角到該門市
-                L.popup()
-                    .setLatLng([lat, lng])
-                    .setContent(name)
-                    .openOn(map);
+                map.setView([lat, lng], 18); 
+                L.popup().setLatLng([lat, lng]).setContent(name).openOn(map);
             }
         }
 
@@ -476,12 +453,11 @@
                 if(value === 'store') {
                     addrDiv.classList.remove('show');
                     mapDiv.classList.add('show');
-                    
-                    // ★ Leaflet 修正：當 div 從隱藏變顯示時，需要通知地圖重新計算大小
+                    // Leaflet 地圖大小重算
                     setTimeout(function(){
                         if(map) {
                             map.invalidateSize();
-                            map.setView([24.957, 121.240], 16); // 重新將視野對準中原大學
+                            map.setView([24.957, 121.240], 16); 
                         }
                     }, 200);
                 } else {
@@ -491,33 +467,24 @@
             }
         }
 
-        // OpenStreetMap (Leaflet) 初始化
+        // OpenStreetMap 初始化
         function initMap() {
-            // 中原大學座標
             var cycu = [24.957, 121.240];
-            
             try {
-                // 初始化地圖
                 map = L.map('googleMap').setView(cycu, 16);
-
-                // 加入圖層 (OpenStreetMap)
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
 
-                // 附近的便利商店資料
                 var stores = [
                     { name: "7-ELEVEN 中原門市", loc: [24.9575, 121.241] },
                     { name: "全家便利商店 中原門市", loc: [24.9565, 121.239] },
                     { name: "萊爾富 中壢中原店", loc: [24.958, 121.238] }
                 ];
 
-                // 建立標記
                 stores.forEach(function(store) {
                     var marker = L.marker(store.loc).addTo(map);
-                    marker.bindPopup(store.name); // 綁定彈出視窗
-
-                    // 點擊標記時填入名稱
+                    marker.bindPopup(store.name);
                     marker.on('click', function() {
                         document.getElementById("storeNameInput").value = store.name;
                     });
@@ -622,35 +589,6 @@
             document.getElementById('checkoutTotal').innerText = '$' + (total + 60);
         }
 
-        function confirmSection(btn) {
-            var section = btn.closest('.form-section');
-            
-            if(!section.classList.contains('locked')) {
-                var inputs = section.querySelectorAll('input');
-                var isValid = true;
-                
-                for(var i=0; i<inputs.length; i++) {
-                    if(inputs[i].offsetParent !== null && !inputs[i].value && !inputs[i].readOnly && inputs[i].type !== "hidden") {
-                        isValid = false;
-                        break;
-                    }
-                }
-                
-                if(!isValid) {
-                    alert("請確認此區塊的所有資料都已填寫完畢！");
-                    return;
-                }
-                
-                section.classList.add('locked');
-                btn.innerText = "取消確認";
-                btn.classList.add('cancel');
-            } else {
-                section.classList.remove('locked');
-                btn.innerText = "確認";
-                btn.classList.remove('cancel');
-            }
-        }
-
         function submitOrder() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
             if(!user) {
@@ -659,17 +597,29 @@
                 return;
             }
             
-            var sections = document.querySelectorAll('.form-section');
-            var allConfirmed = true;
-            
-            for(var i=0; i<sections.length; i++) {
-                if(sections[i].querySelector('.btn-confirm') && !sections[i].classList.contains('locked')) {
-                    allConfirmed = false;
+            // 檢查所有在 .checkout-container 內的可見輸入框
+            var inputs = document.querySelectorAll('.checkout-container input');
+            var allValid = true;
+
+            for(var i=0; i<inputs.length; i++) {
+                // 檢查條件：1. 元素是可見的 (offsetParent != null) 2. 不是隱藏欄位 3. 不是唯讀欄位 (地圖輸入框除外，因為它是唯讀但必須有值)
+                if(inputs[i].offsetParent !== null && inputs[i].type !== "hidden") {
+                    // 特殊處理：如果是地圖輸入框，雖然是 readonly 但必須有值
+                    if(inputs[i].id === "storeNameInput") {
+                        if(inputs[i].value.trim() === "") {
+                            allValid = false;
+                            break;
+                        }
+                    } else if(inputs[i].readOnly === false && inputs[i].value.trim() === "") {
+                        // 一般輸入框
+                        allValid = false;
+                        break;
+                    }
                 }
             }
             
-            if(!allConfirmed) {
-                alert("請先確認所有結帳區塊資訊！");
+            if(!allValid) {
+                alert("請確認所有欄位資料都已填寫完畢！");
                 return;
             }
             
@@ -678,6 +628,7 @@
             window.location.href = 'member.html';
         }
 
+        // Header 搜尋功能
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
         
         function siteSearch() {
