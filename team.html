@@ -47,12 +47,14 @@
             background: #fff;
             margin-bottom: 15px;
             border: 3px solid rgba(255,255,255,0.5);
+            overflow: hidden;         /* 限制圓形 */
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ccc;
-            font-size: 0.8rem;
         }
+
+
+        
         .brand-logo-place {
             width: 150px;
             height: 150px;
@@ -83,7 +85,7 @@
     </style>
 </head>
 <body>
-    <div class="marquee-container">✨ 認識我們的團隊 ✨ 致力於為您提供最優質的甜點體驗 ✨</div>
+    <div class="marquee-container">✨ 認識我們的團隊 ✨ 致力於為您提供最優質的購物體驗 ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">
             <img src="images/Logo.PNG" alt="Logo">
@@ -106,7 +108,7 @@
     <div class="container">
         <h2 class="brand-intro-title">品牌介紹</h2>
         <div class="card" style="margin-bottom: 40px; text-align: center;">
-            <div class="brand-logo-place">Logo</div>
+            <img class="brand-logo-place" src="images/Logo.PNG" alt="Logo">
             
             <h1 style="margin-bottom: 20px; font-size: 1.8rem; color: #FF7F50;">賣國賊 (Treat Trader)</h1>
             <div class="brand-intro-box">
@@ -131,7 +133,7 @@
                 <p>學會黑黃配色與網頁排版技巧，了解用色影響用戶體驗。</p>
             </div>
             <div class="team-card">
-                <div class="member-avatar">Avatar</div>
+                <img class="member-avatar" src="images/Logo.PNG" alt="焦紫菱">
                 <h3>資管二甲 焦紫菱</h3>
                 <p>熟悉卡片化排版與表格設計，對長條式排版掌握更好。</p>
             </div>

@@ -180,6 +180,58 @@ nav.main-nav a:hover {
     overflow: hidden;
 }
 
+/* --- 酷炫廣告輪播hero slide --- */
+.hero-slider { 
+    height: 400px; 
+    border-radius: 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 40px; 
+    cursor: pointer; 
+    overflow: hidden;
+    position: relative; 
+    background-color: #333; 
+    background-size: cover;
+    background-position: center;
+    transition: background-image 1s ease-in-out, transform 0.3s ease;    
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background-repeat: no-repeat;
+}
+.hero-slider:hover { 
+    transform: scale(1.015); 
+}
+
+/* ad text container */
+.slide-content { 
+    font-size: 2.8rem; 
+    font-weight: 900; 
+    color: #5C4033;
+    background: rgba(255, 255, 255, 0.35); 
+    backdrop-filter: blur(12px);           
+    -webkit-backdrop-filter: blur(12px);
+    padding: 40px 60px; 
+    border-radius: 20px; 
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-width: 80%;
+    position: relative;
+    z-index: 2;
+
+    animation: coolShow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    pointer-events: none; 
+}
+
+@keyframes coolShow {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px) scale(0.9); }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); }
+}
+
 .btn {
     display: inline-block;
     padding: 10px 25px;
@@ -273,7 +325,8 @@ footer {
 
     nav.main-nav {
         grid-area: nav;
-        border-top: 1px solid rgba(0,0,0,0.05);        justify-content: center;
+        border-top: 1px solid rgba(0,0,0,0.05);        
+        justify-content: center;
         margin-top: 10px;
         padding-top: 10px;
         border-top: 1px solid rgba(0,0,0,0.05);
@@ -287,6 +340,32 @@ footer {
     nav.main-nav a { margin: 0 5px; font-size: 14px; }
     .header-icons { gap: 15px; }
 }
+/* 廣告 RWD*/
+@media (max-width: 1024px) {
+    .slide-content {
+        font-size: 2rem;  
+        padding: 25px 40px;
+        max-width: 90%;
+    }
+    .hero-slider {
+        height: 350px;
+    }
+}
+
+/* 手機螢幕 (480px) */
+@media (max-width: 480px) {
+    .slide-content {
+        font-size: 1.4rem;  
+        padding: 15px 25px;  
+        border-radius: 12px; 
+        max-width: 85%;
+        font-weight: 700; 
+    }
+    .hero-slider {
+        height: 250px;    
+        border-radius: 15px;
+    }
+}
 
 /* hover(important)--for index */
 #recommendList .card {
@@ -295,12 +374,11 @@ footer {
 }
 
 #recommendList .card:hover {
-    /* 使用 !important 強制壓過 JS 的 inline style */
     transform: translateY(-8px) !important;
     box-shadow: 0 12px 20px rgba(0,0,0,0.15) !important;
-    border: 1px solid #FF7F50 !important; /* 選配：加個橘色邊框 */
+    border: 1px solid #FF7F50 !important; 
 }
 
 #recommendList .card:hover div[style*="background:#eee"] {
-    background: #FFECB3 !important; /* 移上去時灰色變奶油黃 */
+    background: #FFECB3 !important; 
 }

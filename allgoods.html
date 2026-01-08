@@ -44,10 +44,50 @@
             color: #e2b007;
         }
         
+        .mid-filter { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            margin-bottom: 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 15px; }
+
+        .filter-left { 
+            display: flex; 
+            flex: 1; 
+            min-width: 250px; }
+
+        .filter-left input { 
+            flex: 1; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px 0 0 5px; 
+            border-right: none; 
+            outline: none; }
+
+        .filter-left button { 
+            border-radius: 0 5px 5px 0;
+             padding: 10px 20px; }
+
+        .filter-right { 
+            flex: 0.5; 
+            min-width: 200px; }
+
+        .filter-right select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            outline: none; 
+            cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ✨</div>
+    <div class="marquee-container">✨ 新年回饋祭滿 $2500 免運 ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">
             <img src="images/Logo.PNG" alt="Logo">
@@ -68,6 +108,27 @@
     </header>
 
     <div class="container">
+        <!-- 搜尋欄&篩選 -->
+        <div class="mid-filter">
+            <div class="filter-left">
+                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋" onkeypress="handleEnterFilter(event)"><button class="btn" onclick="filterProducts()">搜尋</button>
+            </div>
+            <div class="filter-right">
+                <select id="midCategory" onchange="filterProducts()">
+                    <option value="all">所有類別</option>
+                    <option value="japan">日本 (Japan)</option>
+                    <option value="france">法國 (France)</option>
+                    <option value="germany">德國 (Germany)</option>
+                    <option value="belgium">比利時 (Belgium)</option>
+                    <option value="italy">義大利 (Italy)</option>
+                    <option value="usa">美國 (USA)</option>
+                    <option value="uk">英國 (UK)</option>
+                    <option value="korea">韓國 (Korea)</option>
+                    <option value="taiwan">台灣 (Taiwan)</option>
+                </select>
+            </div>
+        </div>
+        
         <h2>全部商品</h2>
         <div id="productList" class="product-grid"></div>
     </div>
@@ -90,6 +151,8 @@
     </footer>
 
     <script>
+        var allData = []; // mid filter用
+
         window.onload = function() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
             if(user) document.getElementById('avatarLink').href = "member.html";
@@ -103,10 +166,13 @@
             fetch('products.json')
                 .then(function(res){ return res.json(); })
                 .then(function(data){
+                    allData = data; // 📍 新增這行：把資料存起來供篩選器使用
                     var displayData = data;
                     if(searchKey) {
                         displayData = data.filter(function(p){ return p.name.includes(searchKey); });
                         document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
+                        // 📍 新增這行：把搜尋字填入篩選框，方便使用者看
+                        if(document.getElementById('midSearch')) document.getElementById('midSearch').value = searchKey;
                     }
                     renderList(displayData);
                 });
@@ -175,6 +241,7 @@
             }
         });
 
+        // search bar系列的東西們
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
         function siteSearch() {
             var val = document.getElementById('globalSearch').value.trim();
@@ -185,6 +252,7 @@
                 else location.href = "allgoods.html?search=" + encodeURIComponent(val);
             });
         }
+
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');
@@ -198,7 +266,23 @@
             });
         }
 
-        // search bar
+        function handleEnterFilter(e) { if(e.key === 'Enter') filterProducts(); }
+
+        function filterProducts() {
+            var key = document.getElementById("midSearch").value.toLowerCase();
+            var cat = document.getElementById("midCategory").value;
+            
+            // 從我們剛才存好的 allData 裡面過濾
+            var filtered = allData.filter(function(p){ 
+                var matchKey = p.name.toLowerCase().includes(key);
+                var matchCat = (cat === "all" || p.category === cat);
+                return matchKey && matchCat;
+            });
+            
+            // 更新標題
+            document.querySelector('h2').innerText = (key || cat !== "all") ? "篩選結果" : "全部商品";
+            renderList(filtered); // 📍 修正：原本這裡是 renderProducts 會導致報錯
+        }
     </script>
 </body>
 </html>

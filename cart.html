@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>購物車 - SWEET TRADER</title>
     <link rel="stylesheet" href="style.css">
-    <!-- 導入Font Awesome圖庫，用於網頁icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- 導入Leaflet CSS，搭配OpenStreetMap，用於地圖 -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     
     <style>
@@ -103,14 +101,6 @@
             background: #fff;
         }
 
-        /* 鎖定時的樣式 */
-        .form-section.locked .selection-group, 
-        .form-section.locked input {
-            pointer-events: none;
-            opacity: 0.7;
-            background: #f9f9f9;
-        }
-        
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -120,20 +110,6 @@
         .section-title {
             font-weight: bold;
             color: #FF7F50;
-        }
-
-        .btn-confirm {
-            padding: 4px 12px;
-            background: #5C4033;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .btn-confirm.cancel {
-            background: #FF6347;
         }
         
         /* 選項按鈕群組 (單選) */
@@ -318,19 +294,17 @@
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">收件資訊</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 <div>
-                    <input type="text" placeholder="姓名">
-                    <input type="tel" placeholder="電話號碼">
-                    <input type="email" placeholder="Email">
+                    <input type="text" id="recvName" placeholder="姓名">
+                    <input type="tel" id="recvPhone" placeholder="電話號碼">
+                    <input type="email" id="recvEmail" placeholder="Email">
                 </div>
             </div>
 
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">付款方式</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 
                 <div class="selection-group" id="payGroup">
@@ -344,7 +318,7 @@
                     <input type="text" placeholder="請輸入信用卡號或轉帳後五碼">
                 </div>
                 <div id="payQR" class="dynamic-field" style="text-align:center;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TreatTraderPay" alt="Scan to Pay">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://itouch.cycu.edu.tw/active_project/cycu1500h_01/donate/" alt="Scan to Pay">
                     <p style="font-size:0.8rem; color:#888;">請掃描 QR Code 付款</p>
                 </div>
             </div>
@@ -352,7 +326,6 @@
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">收貨方式</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 
                 <div class="selection-group" id="shipGroup">
@@ -378,7 +351,6 @@
             <div class="form-section">
                 <div class="section-header">
                     <span class="section-title">開立發票</span>
-                    <button class="btn-confirm" onclick="confirmSection(this)">確認</button>
                 </div>
                 
                 <div class="selection-group" id="invGroup">
@@ -393,7 +365,7 @@
                 <div class="section-header"><span class="section-title">訂單明細</span></div>
                 <div id="checkoutItemsList"></div>
                 <div style="border-top: 1px solid #ddd; margin-top: 10px; padding-top: 5px; display:flex; justify-content:space-between;">
-                    <span>運費</span><span>$60</span>
+                    <span>運費</span><span id="shippingFeeDisplay">$60</span>
                 </div>
                 <div style="text-align:right; margin-top:10px; font-weight:bold; color:#FF7F50; font-size:1.2rem;">
                     總金額 <span id="checkoutTotal">$0</span>
@@ -551,9 +523,9 @@
             cart.forEach(function(item, index) {
                 var subtotal = item.price * item.qty;
                 total += subtotal;
+                // 修改：移除了圖片 div，並在 item-price 加入 margin-left: auto 將價格推到右邊
                 html += '<div class="cart-item">' +
                         '<div class="delete-btn" onclick="removeItem('+index+')">×</div>' +
-                        '<div style="width:80px; height:80px; background:#eee; display:flex; align-items:center; justify-content:center; font-size:0.8rem; color:#888;">商品圖</div>' +
                         '<div class="item-details">' +
                             '<h4 class="p-name">'+item.name+'</h4>' +
                             '<div class="qty-control">' +
@@ -562,7 +534,7 @@
                                 '<button onclick="updateQty('+index+', 1)">+</button>' +
                             '</div>' +
                         '</div>' +
-                        '<div class="item-price">$'+subtotal+'</div>' +
+                        '<div class="item-price" style="margin-left: auto; font-weight: bold;">$'+subtotal+'</div>' +
                         '</div>';
             });
             
@@ -594,6 +566,15 @@
 
             if(show) {
                 if(cartItems.length === 0) return;
+                
+                // 自動填入會員資料
+                var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+                if(user) {
+                    if(document.getElementById('recvName')) document.getElementById('recvName').value = user.name || "";
+                    if(document.getElementById('recvPhone')) document.getElementById('recvPhone').value = user.phone || "";
+                    if(document.getElementById('recvEmail')) document.getElementById('recvEmail').value = user.email || "";
+                }
+
                 updateCheckoutList(cartItems);
                 cartCol.classList.add('locked');
                 checkCol.classList.add('active');
@@ -625,36 +606,16 @@
                 list.appendChild(row);
             });
             
-            document.getElementById('checkoutTotal').innerText = '$' + (total + 60);
-        }
-
-        function confirmSection(btn) {
-            var section = btn.closest('.form-section');
-            
-            if(!section.classList.contains('locked')) {
-                var inputs = section.querySelectorAll('input');
-                var isValid = true;
-                
-                for(var i=0; i<inputs.length; i++) {
-                    if(inputs[i].offsetParent !== null && !inputs[i].value && !inputs[i].readOnly && inputs[i].type !== "hidden") {
-                        isValid = false;
-                        break;
-                    }
-                }
-                
-                if(!isValid) {
-                    alert("請確認此區塊的所有資料都已填寫完畢！");
-                    return;
-                }
-                
-                section.classList.add('locked');
-                btn.innerText = "取消確認";
-                btn.classList.add('cancel');
-            } else {
-                section.classList.remove('locked');
-                btn.innerText = "確認";
-                btn.classList.remove('cancel');
+            // 滿額免運判斷
+            var shipping = 60;
+            var shippingText = "$60";
+            if (total > 2500) {
+                shipping = 0;
+                shippingText = "免運費";
             }
+            
+            document.getElementById('shippingFeeDisplay').innerText = shippingText;
+            document.getElementById('checkoutTotal').innerText = '$' + (total + shipping);
         }
 
         function submitOrder() {
@@ -665,17 +626,27 @@
                 return;
             }
             
-            var sections = document.querySelectorAll('.form-section');
-            var allConfirmed = true;
+            // 檢查所有在結帳區塊內的輸入框
+            var checkoutContainer = document.getElementById('checkoutContainer');
+            var inputs = checkoutContainer.querySelectorAll('input');
+            var allFilled = true;
             
-            for(var i=0; i<sections.length; i++) {
-                if(sections[i].querySelector('.btn-confirm') && !sections[i].classList.contains('locked')) {
-                    allConfirmed = false;
+            for(var i=0; i<inputs.length; i++) {
+                // 檢查條件：不是 hidden 欄位 且 (offsetParent 不為 null 代表元素是可見的)
+                if(inputs[i].type !== 'hidden' && inputs[i].offsetParent !== null) {
+                    // 如果不是唯讀欄位且內容為空
+                    if(!inputs[i].readOnly && inputs[i].value.trim() === "") {
+                        allFilled = false;
+                        // 可以標記紅色框框提醒
+                        inputs[i].style.borderColor = "red";
+                    } else {
+                        inputs[i].style.borderColor = "#ddd";
+                    }
                 }
             }
             
-            if(!allConfirmed) {
-                alert("請先確認所有結帳區塊資訊！");
+            if(!allFilled) {
+                alert("請確認所有欄位都已填寫完畢！");
                 return;
             }
             

@@ -7,16 +7,32 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        .hero-slider { height: 400px; background: #FFE4B5; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; cursor: pointer; color: #5C4033; text-align: center; padding: 0 20px; transition: transform 0.2s; position: relative; }
         .hero-slider:hover { transform: scale(1.01); }
-        .slide-content { font-size: 2.5rem; font-weight: bold; background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; animation: fadeText 3s infinite alternate; }
-        @keyframes fadeText { from { opacity: 0.8; } to { opacity: 1; } }
-        .mid-filter { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .filter-left { display: flex; flex: 1; min-width: 250px; }
-        .filter-left input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px 0 0 5px; border-right: none; outline: none; }
-        .filter-left button { border-radius: 0 5px 5px 0; padding: 10px 20px; }
-        .filter-right { flex: 0.5; min-width: 200px; }
-        .filter-right select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; outline: none; cursor: pointer; }
+
+        @keyframes coolShow {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        #recommendList .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;    /* 讓圖片與文字水平居中 */
+            justify-content: center;
+            text-align: center;     /* 確保多行文字也居中 */
+            padding: 20px;
+        }
+
+        #recommendList .img-placeholder {
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
@@ -46,27 +62,6 @@
             <div class="slide-content" id="heroText"> Treat Trader：不出國也能吃遍世界！ </div>
         </div>
 
-        <div class="mid-filter">
-            <div class="filter-left">
-                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋" onkeypress="handleEnterFilter(event)">
-                <button class="btn" onclick="filterProducts()">搜尋</button>
-            </div>
-            <div class="filter-right">
-                <select id="midCategory" onchange="filterProducts()">
-                    <option value="all">所有類別</option>
-                    <option value="japan">日本 (Japan)</option>
-                    <option value="france">法國 (France)</option>
-                    <option value="germany">德國 (Germany)</option>
-                    <option value="belgium">比利時 (Belgium)</option>
-                    <option value="italy">義大利 (Italy)</option>
-                    <option value="usa">美國 (USA)</option>
-                    <option value="uk">英國 (UK)</option>
-                    <option value="korea">韓國 (Korea)</option>
-                    <option value="tw">台灣 (Taiwan)</option>
-                </select>
-            </div>
-        </div>
-
         <h2>熱門推薦商品</h2>
         <div id="recommendList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 20px;"></div>
     </div>
@@ -89,11 +84,6 @@
     </footer>
     
     <script>
-        window.onload = function() {
-            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
-            if(user) document.getElementById('avatarLink').href = "member.html";
-        };
-
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
         function siteSearch() {
             var val = document.getElementById('globalSearch').value.trim();
@@ -105,64 +95,87 @@
             });
         }
 
-        function handleSearchInput(input) {
-            var val = input.value.toLowerCase();
-            var box = document.getElementById('searchSuggestions');
-            if(val.length < 1) { box.style.display = 'none'; return; }
-            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
-                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
-                if(matches.length > 0) {
-                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
-                    box.style.display = 'block';
-                } else { box.style.display = 'none'; }
-            });
+        // --- 廣告輪播功能 ---
+        var ads = [
+            { text: "🇯🇵 日本抹茶蛋糕：第二件半價", id: 1, image: "Matcha.jpg" }, 
+            { text: "🇫🇷 法國馬卡龍：浪漫直送到家", id: 3, image: "Macaron.jpg" }, 
+            { text: "🇺🇸 紐約起司蛋糕：濃郁登場", id: 7, image: "CheeseCake.jpg" },
+            { text: "🇹🇼 台灣精選零食：經典在地美味", id: 12, image: "Pineapple.jpg" }
+        ];
+
+        function clickAd() { 
+            if (currentAdId) {
+                location.href = "goods.html?id=" + currentAdId; 
+            }
         }
 
-        // 廣告輪播
-        var ads = [{ text: "🇯🇵 日本抹茶蛋糕：第二件半價 (點擊查看)", id: 1 }, { text: "🇫🇷 法國馬卡龍：浪漫直送到家 (點擊查看)", id: 3 }, { text: "🇺🇸 紐約起司蛋糕：濃郁登場 (點擊查看)", id: 7 }];
-        var adIdx = 0; var currentAdId = 1;
-        function updateAd() { document.getElementById("heroText").innerText = ads[adIdx].text; currentAdId = ads[adIdx].id; adIdx = (adIdx + 1) % ads.length; }
-        updateAd(); setInterval(updateAd, 5000);
-        function clickAd() { location.href = "goods.html?id=" + currentAdId; }
+        // img preload
+        ads.forEach(ad => {
+            const img = new Image();
+            img.src = `images/${ad.image}`;
+        });
 
-        var allData = [];
+        var adIdx = 0;
+        var currentAdId = 1;
+
+        function updateAd() { 
+            const heroSlider = document.getElementById("heroSlider");
+            const heroText = document.getElementById("heroText");
+            if (!heroSlider || !heroText) return;
+
+            const currentAd = ads[adIdx];
+
+            // img transition
+            heroSlider.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('images/${currentAd.image}')`;
+            
+            // animation
+            heroText.style.animation = 'none';
+            heroText.offsetHeight; 
+            heroText.style.animation = 'coolShow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+
+            heroText.innerText = currentAd.text; 
+            currentAdId = currentAd.id; 
+            adIdx = (adIdx + 1) % ads.length; 
+        }
+
+        // onload
+        document.addEventListener('DOMContentLoaded', function() {
+            // 搬過來的會員判斷邏輯
+            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+            if(user) document.getElementById('avatarLink').href = "member.html";
+
+            // 啟動廣告
+            updateAd();
+            setInterval(updateAd, 5000);
+        });
+
+        // --- 商品載入功能 ---
         fetch('products.json').then(function(res) { return res.json(); }).then(function(data) { 
-            allData = data; 
-            renderProducts(data.slice(0, 8)); 
+            renderProducts(data.slice(0, 8)); // 抓前 8 個當推薦
         });
 
         function renderProducts(list) {
-        var container = document.getElementById("recommendList");
-            
-        // 空狀態提示
-        if (!list || list.length === 0) {
-            container.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 15px;">
-                    <i class="fa-solid fa-cookie-bite" style="font-size: 4rem; color: #FFD2A6; margin-bottom: 20px;"></i>
-                    <h3 style="color: #5C4033;">喔喔！找不到相關商品</h3>
-                    <p style="color: #888; margin-bottom: 20px;">試試看其他關鍵字。</p>
-                    <button onclick="location.href='allgoods.html'" class="btn">查看所有商品</button>
-                </div>`;
-            return;
-        }
+            var container = document.getElementById("recommendList");
+            if (!container) return;
+                
+            if (!list || list.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 15px;">
+                        <i class="fa-solid fa-cookie-bite" style="font-size: 4rem; color: #FFD2A6; margin-bottom: 20px;"></i>
+                        <h3 style="color: #5C4033;">喔喔！找不到相關商品</h3>
+                        <button onclick="location.href='allgoods.html'" class="btn">查看所有商品</button>
+                    </div>`;
+                return;
+            }
 
-        // 渲染結構：與 goods.html 保持一致
-        container.innerHTML = list.map(function(p){
-            return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
-                   '<div class="img-placeholder">' + 
-                   '<img src="images/' + p.img + '" alt="' + p.name + '" style="width:100%; height:100%; object-fit:cover;">' + 
-                   '</div>' +
-                   '<h4>' + p.name + '</h4>' +
-                   '<p>$' + p.price + '</p></div>';
-        }).join("");
-    }
-
-        function handleEnterFilter(e) { if(e.key === 'Enter') filterProducts(); }
-        function filterProducts() {
-            var key = document.getElementById("midSearch").value.toLowerCase();
-            var cat = document.getElementById("midCategory").value;
-            var filtered = allData.filter(function(p){ return (cat === "all" || p.category === cat) && p.name.toLowerCase().includes(key); });
-            renderProducts(filtered);
+            container.innerHTML = list.map(function(p){
+                return '<div class="card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
+                    '<div class="img-placeholder">' + 
+                    '<img src="images/' + p.img + '" alt="' + p.name + '" style="width:100%; height:100%; object-fit:cover;">' + 
+                    '</div>' +
+                    '<h4>' + p.name + '</h4>' +
+                    '<p>$' + p.price + '</p></div>';
+            }).join("");
         }
 
         // 自動隱藏搜尋建議
