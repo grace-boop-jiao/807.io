@@ -85,7 +85,7 @@
 
         /* ===== 評論卡片美化 ===== */
         .review-card {
-            background: #fff;              /* 淡奶油色 */
+            background: #fff;
             border-radius: 12px;
             padding: 12px 16px;
             margin-bottom: 12px;
@@ -127,7 +127,7 @@
     </style>
 </head>
 <body>
-    <div class="marquee-container">✨ 新年回饋祭最高 10% OFF ｜ 滿 $2500 免運 ｜ 加入會員領取專屬禮券 ✨</div>
+    <div class="marquee-container">✨ 新年回饋祭最高 ｜ 滿 $2500 免運  ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">
             <img src="images/Logo.PNG" alt="Logo">
@@ -153,7 +153,7 @@
             <div>
                 <h1 id="pName">載入中...</h1>
                 <p id="pPrice" style="font-size: 2rem; color: #FF7F50; margin: 15px 0;">$0</p>
-                <div id="pRatingDisplay" style="color: #e2b007; font-size: 1.2rem; margin-bottom: 20px;">★★★★☆ (4.5)</div>
+                <div id="pRatingDisplay" style="color: #e2b007; font-size: 1.2rem; margin-bottom: 20px;">暫無評分</div>
                 <div style="display:flex; gap:15px; margin-top: 30px;">
                     <button class="btn" style="flex:1; padding: 15px; font-size:1.1rem;" onclick="addToCart(false)">加入購物車</button>
                     <button class="btn" style="flex:1; background:#5C4033; padding: 15px; font-size:1.1rem;" onclick="addToCart(true)">直接購買</button>
@@ -331,6 +331,43 @@
         ];
     }
 
+    // ⭐ 新增：依真實評論重新計算商品平均星等，更新上方顯示
+    function updateProductRatingFromReviews(realReviews) {
+        var display = document.getElementById('pRatingDisplay');
+        if (!display) return;
+
+        if (!realReviews || realReviews.length === 0) {
+            display.innerHTML = '暫無評分';
+            return;
+        }
+
+        var sum = 0;
+        var count = 0;
+
+        realReviews.forEach(function (r) {
+            var rating = Number(r.rating);
+            if (!isNaN(rating) && rating > 0) {
+                sum += rating;
+                count++;
+            }
+        });
+
+        if (count === 0) {
+            display.innerHTML = '暫無評分';
+            return;
+        }
+
+        var avg = (sum / count).toFixed(1);   // 平均分數
+        var rounded = Math.round(avg);        // 用來畫幾顆實心星
+
+        var stars = '';
+        for (var i = 1; i <= 5; i++) {
+            stars += (i <= rounded) ? '★' : '☆';
+        }
+
+        display.innerHTML = stars + ' (' + avg + ')';
+    }
+
     // 讀取評論：假評論 + 後端真實評論，一起做前端分頁
     function loadReviews() {
         fetch(API_BASE + "/Reviews/product/" + pid + "?page=1&pageSize=9999")
@@ -338,6 +375,9 @@
             .then(function (data) {
                 var realReviews = data.items || []; // 後端回來的真實評論
                 var allReviews = getFakeReviewsForProduct().concat(realReviews);
+
+                // ⭐ 這一行：依「真實評論」更新商品星等
+                updateProductRatingFromReviews(realReviews);
 
                 // 依日期排序（新到舊）
                 allReviews.sort(function (a, b) {
@@ -461,7 +501,7 @@
             alert("評論已送出！");
             contentInput.value = "";
             currentPage = 1;   // 回到第一頁
-            loadReviews();     // 重新載入：會看到新評論 + 預設假評論
+            loadReviews();     // 重新載入：會看到新評論，星等也會被重新計算
         })
         .catch(function (err) {
             alert(err.message || "評論送出失敗");
@@ -530,3 +570,4 @@
 
 </body>
 </html>
+

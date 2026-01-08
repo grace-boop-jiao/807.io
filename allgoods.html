@@ -32,7 +32,6 @@
             margin: 0 auto 10px;
             display: block;
             color: #888;
-
             object-fit: cover;
         }
         .rating-stars {
@@ -54,12 +53,14 @@
             justify-content: space-between; 
             align-items: center; 
             flex-wrap: wrap; 
-            gap: 15px; }
+            gap: 15px; 
+        }
 
         .filter-left { 
             display: flex; 
             flex: 1; 
-            min-width: 250px; }
+            min-width: 250px; 
+        }
 
         .filter-left input { 
             flex: 1; 
@@ -67,15 +68,18 @@
             border: 1px solid #ddd; 
             border-radius: 5px 0 0 5px; 
             border-right: none; 
-            outline: none; }
+            outline: none; 
+        }
 
         .filter-left button { 
             border-radius: 0 5px 5px 0;
-             padding: 10px 20px; }
+            padding: 10px 20px; 
+        }
 
         .filter-right { 
             flex: 0.5; 
-            min-width: 200px; }
+            min-width: 200px; 
+        }
 
         .filter-right select { 
             width: 100%; 
@@ -83,7 +87,8 @@
             border: 1px solid #ddd; 
             border-radius: 5px; 
             outline: none; 
-            cursor: pointer; }
+            cursor: pointer; 
+        }
     </style>
 </head>
 <body>
@@ -111,7 +116,8 @@
         <!-- 搜尋欄&篩選 -->
         <div class="mid-filter">
             <div class="filter-left">
-                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋" onkeypress="handleEnterFilter(event)"><button class="btn" onclick="filterProducts()">搜尋</button>
+                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋" onkeypress="handleEnterFilter(event)">
+                <button class="btn" onclick="filterProducts()">搜尋</button>
             </div>
             <div class="filter-right">
                 <select id="midCategory" onchange="filterProducts()">
@@ -151,61 +157,93 @@
     </footer>
 
     <script>
-        var allData = []; // mid filter用
+        const API_BASE = "http://localhost:5038/api"; // 記得跟後端 port 一致
+
+        var allData = [];          // 商品列表資料
+        var productRatings = {};   // 每個商品的平均星等 { productId: avgRating }
 
         window.onload = function() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
-            if(user) document.getElementById('avatarLink').href = "member.html";
+            if (user) document.getElementById('avatarLink').href = "member.html";
             fetchData();
         };
 
         var urlParams = new URLSearchParams(window.location.search);
         var searchKey = urlParams.get('search');
 
+        // 從後端抓每個商品的評論，計算平均星等
+        function loadRatingsForProducts(products) {
+            var tasks = products.map(function (p) {
+                return fetch(API_BASE + "/Reviews/product/" + p.id + "?page=1&pageSize=9999")
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        var items = data.items || [];
+                        if (!items.length) {
+                            productRatings[p.id] = 0;
+                            return;
+                        }
+                        var sum = 0, count = 0;
+                        items.forEach(function (r) {
+                            var rating = Number(r.rating);
+                            if (!isNaN(rating) && rating > 0) {
+                                sum += rating;
+                                count++;
+                            }
+                        });
+                        productRatings[p.id] = count ? parseFloat((sum / count).toFixed(1)) : 0;
+                    })
+                    .catch(function () {
+                        // 若發生錯誤，當作暫無評分
+                        productRatings[p.id] = 0;
+                    });
+            });
+
+            return Promise.all(tasks);
+        }
+
         function fetchData() {
             fetch('products.json')
                 .then(function(res){ return res.json(); })
                 .then(function(data){
-                    allData = data; // 📍 新增這行：把資料存起來供篩選器使用
-                    var displayData = data;
-                    if(searchKey) {
-                        displayData = data.filter(function(p){ return p.name.includes(searchKey); });
-                        document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
-                        // 📍 新增這行：把搜尋字填入篩選框，方便使用者看
-                        if(document.getElementById('midSearch')) document.getElementById('midSearch').value = searchKey;
-                    }
-                    renderList(displayData);
+                    allData = data; // 存起來給篩選用
+                    
+                    // 先抓所有商品的星等，再渲染畫面
+                    return loadRatingsForProducts(data).then(function () {
+                        var displayData = data;
+                        if (searchKey) {
+                            displayData = data.filter(function(p){ return p.name.includes(searchKey); });
+                            document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
+                            if (document.getElementById('midSearch')) {
+                                document.getElementById('midSearch').value = searchKey;
+                            }
+                        }
+                        renderList(displayData);
+                    });
                 });
         }
 
+        // 從全域的 productRatings 裡拿平均星等
         function calculateAvgRating(pid) {
-            var allReviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
-            var productReviews = allReviews.filter(function(r){ return r.pid == pid; });
-            
-            
-            if(productReviews.length === 0) return 4.4; 
-
-            var sum = productReviews.reduce(function(a, b){ return a + b.rating; }, 0);
-            return (sum / productReviews.length).toFixed(1);
+            return productRatings[pid] || 0;
         }
 
         function renderStars(rating) {
             var html = "";
-            for(var i=1; i<=5; i++) {
-                if(i <= Math.round(rating)) html += '<i class="fa-solid fa-star active"></i>';
+            for (var i = 1; i <= 5; i++) {
+                if (i <= Math.round(rating)) html += '<i class="fa-solid fa-star active"></i>';
                 else html += '<i class="fa-solid fa-star"></i>';
             }
             if (rating == 0) {
                 return html + ' <span style="color:#aaa; font-size: 0.8rem;">(暫無評分)</span>';
             }
 
-            return html + ' <span style="color:#555;">(' + rating + ')</span>';
+            return html + ' <span style="color:#555;">(' + rating.toFixed(1) + ')</span>';
         }
 
         function renderList(data) {
             var container = document.getElementById("productList");
     
-            // 如果搜尋不到任何商品 (data 是空的)
+            // 如果搜尋不到任何商品
             if (!data || data.length === 0) {
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 15px;">
@@ -215,36 +253,39 @@
                         <button onclick="location.href='allgoods.html'" class="btn">查看所有商品</button>
                     </div>
                 `;
-                return; // 停止執行後面的 map，不然會報錯
+                return;
             }
 
             // 若有資料，正常顯示商品
             container.innerHTML = data.map(function(p) {
                 var rating = calculateAvgRating(p.id);
-                return '<div class="card product-card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
-                       '<img class="img-placeholder" src="images/' + p.img + '"></img>' +
-                       '<h4>' + p.name + '</h4>' +
-                       '<p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
+                return '' +
+                    '<div class="card product-card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
+                        '<img class="img-placeholder" src="images/' + p.img + '"></img>' +
+                        '<h4>' + p.name + '</h4>' +
+                        '<p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
                         '<div class="rating-stars">' + renderStars(rating) + '</div>' +
-                        '</div>';
+                    '</div>';
             }).join("");
         }
 
-        // 偵測點擊了沒
+        // 偵測點擊了沒（關閉搜尋建議）
         document.addEventListener('click', function(e) {
             var box = document.getElementById('searchSuggestions');
             var input = document.getElementById('globalSearch');
+            if (!box || !input) return;
     
-            // 如果點沒點搜尋框/建議選單，把選單藏起來
             if (e.target !== box && e.target !== input) {
                 box.style.display = 'none';
             }
         });
 
-        // search bar系列的東西們
+        // 全站搜尋相關
         function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
         function siteSearch() {
-            var val = document.getElementById('globalSearch').value.trim();
+            var input = document.getElementById('globalSearch');
+            if (!input) return;
+            var val = input.value.trim();
             if(!val) return;
             fetch('products.json').then(function(r){ return r.json() }).then(function(data){
                 var matches = data.filter(function(p){ return p.name.includes(val); });
@@ -256,6 +297,7 @@
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');
+            if (!box) return;
             if(val.length < 1) { box.style.display = 'none'; return; }
             fetch('products.json').then(function(r){ return r.json() }).then(function(data){
                 var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
@@ -266,22 +308,21 @@
             });
         }
 
+        // 中間篩選區（關鍵字 + 類別）
         function handleEnterFilter(e) { if(e.key === 'Enter') filterProducts(); }
 
         function filterProducts() {
             var key = document.getElementById("midSearch").value.toLowerCase();
             var cat = document.getElementById("midCategory").value;
             
-            // 從我們剛才存好的 allData 裡面過濾
             var filtered = allData.filter(function(p){ 
                 var matchKey = p.name.toLowerCase().includes(key);
                 var matchCat = (cat === "all" || p.category === cat);
                 return matchKey && matchCat;
             });
             
-            // 更新標題
             document.querySelector('h2').innerText = (key || cat !== "all") ? "篩選結果" : "全部商品";
-            renderList(filtered); // 📍 修正：原本這裡是 renderProducts 會導致報錯
+            renderList(filtered);
         }
     </script>
 </body>
