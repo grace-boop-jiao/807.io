@@ -14,6 +14,8 @@ body {
     color: #5C4033;
     line-height: 1.6;
     position: relative;
+    /* overflow: hidden; */
+    /* width: 100%; */
 }
 
 /* --- 跑馬燈 --- */
@@ -331,17 +333,7 @@ footer {
         padding-top: 10px;
         border-top: 1px solid rgba(0,0,0,0.05);
     }
-}
 
-@media (max-width: 480px) {
-    .logo { font-size: 18px; }
-    .logo img { height: 40px; }
-    nav.main-nav { gap: 10px; }
-    nav.main-nav a { margin: 0 5px; font-size: 14px; }
-    .header-icons { gap: 15px; }
-}
-/* 廣告 RWD*/
-@media (max-width: 1024px) {
     .slide-content {
         font-size: 2rem;  
         padding: 25px 40px;
@@ -352,9 +344,14 @@ footer {
     }
 }
 
-/* 手機螢幕 (480px) */
 @media (max-width: 480px) {
-    .slide-content {
+    .logo { font-size: 18px; }
+    .logo img { height: 40px; }
+    nav.main-nav { gap: 10px; }
+    nav.main-nav a { margin: 0 5px; font-size: 14px; }
+
+    .header-icons { gap: 15px; }
+        .slide-content {
         font-size: 1.4rem;  
         padding: 15px 25px;  
         border-radius: 12px; 
