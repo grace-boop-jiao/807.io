@@ -15,6 +15,42 @@
         th, td { border: 1px solid #FFECB3; padding: 10px; text-align: left; }
         th { background: #FFECB3; }
         @media (max-width: 768px) { .member-layout { grid-template-columns: 1fr; } }
+
+        /* 評論卡片樣式，跟商品頁一致 */
+        .review-card {
+            background: #FFF7E8;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+            color: #5C4033;
+            font-weight: 600;
+        }
+        .review-user { margin-right: 8px; }
+        .review-date {
+            font-size: 0.85rem;
+            color: #999;
+        }
+        .review-rating { margin-bottom: 6px; }
+        .review-star {
+            font-size: 1.1rem;
+            margin-right: 2px;
+        }
+        .review-star.filled { color: #FFC107; } /* 黃星星 */
+        .review-star.empty  { color: #DDD; }    /* 灰星星 */
+        .review-content {
+            font-size: 0.95rem;
+            color: #444;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
@@ -56,7 +92,10 @@
                 <div class="card">
                     <h2 class="member-section-title">訂單進度</h2>
                     <div style="margin-bottom: 20px;">
-                        <div class="order-item" style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>訂單 #2026010501 (美國重磅巧克力餅乾)</span><span style="color:blue; font-weight: bold;">出貨中</span></div>
+                        <div class="order-item" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <span>訂單 #2026010501 (美國重磅巧克力餅乾)</span>
+                            <span style="color:blue; font-weight: bold;">出貨中</span>
+                        </div>
                         <div class="progress-container"><div class="progress-bar" style="width: 60%;"></div></div>
                         <p style="font-size:0.85rem; text-align:right;">已離開轉運中心</p>
                     </div>
@@ -97,57 +136,105 @@
     </footer>
 
     <script>
+        const API_BASE = "http://localhost:5038/api";
+
         window.onload = function() {
             var user = JSON.parse(localStorage.getItem('tt_currentUser'));
-            if(!user) { alert("請先登入！"); window.location.href = 'login.html'; }
-            else {
+            if (!user) {
+                alert("請先登入！");
+                window.location.href = 'login.html';
+            } else {
                 document.getElementById('mName').innerText = user.name;
                 document.getElementById('mEmail').innerText = user.email;
-                document.getElementById('mPhone').innerText = user.phone;
+                document.getElementById('mPhone').innerText = user.phone || "-";
                 document.getElementById('avatarLink').href = "member.html";
-                loadMyReviews(user.email);
+                // 用 user.id 去後端抓這個會員的評論
+                loadMyReviews(user.id);
             }
         };
 
         function logout() {
             localStorage.removeItem('tt_currentUser');
-            alert("已登出"); window.location.href = 'login.html';
+            alert("已登出");
+            window.location.href = 'login.html';
         }
 
-        function loadMyReviews(email) {
-            var reviews = JSON.parse(localStorage.getItem('tt_reviews') || "[]");
-            var myReviews = reviews.filter(function(r){ return r.userId === email; });
-            if(myReviews.length > 0) {
-                var html = "<table><tr><th>商品</th><th>評分</th><th>內容</th><th>日期</th></tr>";
-                myReviews.forEach(function(r){
-                    html += "<tr><td><a href='goods.html?id="+r.pid+"' style='color:#FF7F50;'>"+r.pName+"</a></td><td>"+r.rating+"★</td><td>"+r.content+"</td><td>"+r.date+"</td></tr>";
+        // 從後端撈「這個會員的所有評論」
+        function loadMyReviews(userId) {
+            fetch(API_BASE + "/Reviews/user/" + userId)
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var box = document.getElementById('myReviews');
+                    if (!box) return;
+
+                    if (!data || data.length === 0) {
+                        box.innerHTML = '<p>尚無評論紀錄。</p>';
+                        return;
+                    }
+
+                    box.innerHTML = data.map(function (r) {
+                        var stars = '';
+                        var rating = r.rating || 0;
+                        for (var i = 1; i <= 5; i++) {
+                            var cls = i <= rating ? 'filled' : 'empty';
+                            stars += '<span class="review-star ' + cls + '">★</span>';
+                        }
+
+                        var productName = r.productName || ('商品 #' + r.productId);
+                        return (
+                            '<div class="review-card">' +
+                                '<div class="review-header">' +
+                                    '<span class="review-user">' + productName + '</span>' +
+                                    '<span class="review-date">' + (r.date || '') + '</span>' +
+                                '</div>' +
+                                '<div class="review-rating">' + stars + '</div>' +
+                                '<div class="review-content">' + (r.content || '') + '</div>' +
+                            '</div>'
+                        );
+                    }).join('');
+                })
+                .catch(function (err) {
+                    console.error("載入會員評論失敗", err);
                 });
-                html += "</table>";
-                document.getElementById('myReviews').innerHTML = html;
-            }
         }
 
-        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        // 以下是搜尋功能（如果有全站搜尋輸入框的話）
+        function handleEnter(e) { if (e.key === 'Enter') siteSearch(); }
         function siteSearch() {
-            var val = document.getElementById('globalSearch').value.trim();
-            if(!val) return;
-            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
-                var matches = data.filter(function(p){ return p.name.includes(val); });
-                if(matches.length === 0) alert("沒有搜尋到相關商品！");
-                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
-            });
+            var input = document.getElementById('globalSearch');
+            if (!input) return;
+
+            var val = input.value.trim();
+            if (!val) return;
+            fetch('products.json')
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    var matches = data.filter(function(p){ return p.name.includes(val); });
+                    if(matches.length === 0) alert("沒有搜尋到相關商品！");
+                    else location.href = "allgoods.html?search=" + encodeURIComponent(val);
+                });
         }
         function handleSearchInput(input) {
             var val = input.value.toLowerCase();
             var box = document.getElementById('searchSuggestions');
+            if (!box) return;
+
             if(val.length < 1) { box.style.display = 'none'; return; }
-            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
-                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
-                if(matches.length > 0) {
-                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
-                    box.style.display = 'block';
-                } else { box.style.display = 'none'; }
-            });
+            fetch('products.json')
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    var matches = data.filter(function(p){
+                        return p.name.toLowerCase().includes(val);
+                    });
+                    if(matches.length > 0) {
+                        box.innerHTML = matches.map(function(p){
+                            return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>';
+                        }).join('');
+                        box.style.display = 'block';
+                    } else {
+                        box.style.display = 'none';
+                    }
+                });
         }
     </script>
 </body>
