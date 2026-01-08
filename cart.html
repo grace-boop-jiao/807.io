@@ -279,7 +279,7 @@
                 <h2 style="margin-bottom:20px;">購物車</h2>
                 
                 <div id="cartItems">
-                    </div>
+                </div>
 
                 <div class="card" style="margin-top:20px; text-align:right; font-weight:bold; font-size:1.2rem;">
                     總金額 <span id="cartTotal" style="color:#FF7F50;">$0</span>
@@ -648,6 +648,51 @@
             if(!allFilled) {
                 alert("請確認所有欄位都已填寫完畢！");
                 return;
+            }
+
+            // ✅ 這裡開始：組出「最新訂單」，存到 localStorage，給 member.html 顯示訂單進度
+            var cart = JSON.parse(localStorage.getItem('tt_cart') || "[]");
+            if (cart.length > 0) {
+                // 計算商品總金額
+                var total = 0;
+                cart.forEach(function(item) {
+                    total += item.price * item.qty;
+                });
+
+                // 與結帳畫面一致的運費邏輯
+                var shipping = total > 2500 ? 0 : 60;
+
+                // 簡單產一個訂單編號：YYYYMMDDHHMMSS
+                var now = new Date();
+                var y = now.getFullYear();
+                var m = String(now.getMonth() + 1).padStart(2, '0');
+                var d = String(now.getDate()).padStart(2, '0');
+                var hh = String(now.getHours()).padStart(2, '0');
+                var mm = String(now.getMinutes()).padStart(2, '0');
+                var ss = String(now.getSeconds()).padStart(2, '0');
+                var orderId = y + m + d + hh + mm + ss;
+
+                // 商品名稱：一個就顯示該品名，多個就「第一個 + 等 N 項商品」
+                var firstProductName = cart[0].name;
+                var productName;
+                if (cart.length === 1) {
+                    productName = firstProductName;
+                } else {
+                    productName = firstProductName + " 等 " + cart.length + " 項商品";
+                }
+
+                // 準備寫進 localStorage 的訂單資訊
+                var latestOrder = {
+                    userId: user.id,                     // 要跟 member.html 的 user.id 對得上
+                    orderId: orderId,
+                    productName: productName,
+                    statusText: '出貨中',                // 會員中心右上藍字
+                    progressPercent: 60,                 // 進度條％數
+                    desc: '已離開轉運中心'               // 進度條下方的小字說明
+                    // 你之後也可以加 total、shipping 等欄位
+                };
+
+                localStorage.setItem('tt_latestOrder', JSON.stringify(latestOrder));
             }
             
             alert('訂單已送出！感謝您的購買。');

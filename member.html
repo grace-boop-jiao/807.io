@@ -76,6 +76,7 @@
     
     <div class="container">
         <div class="member-layout">
+            <!-- 左側基本資料卡 -->
             <div class="card" style="height: fit-content;" id="profileCard">
                 <div style="text-align:center; margin-bottom:20px;">
                     <div style="width:80px; height:80px; background:#FFD2A6; border-radius:50%; margin: 0 auto 10px;"></div>
@@ -88,19 +89,16 @@
                 <button onclick="logout()" style="width:100%; color:white; background:#d9534f; padding:10px; border-radius:5px; margin-top:20px; border:none; cursor:pointer;">登出</button>
             </div>
 
+            <!-- 右側內容 -->
             <div class="member-fonts" style="display: flex; flex-direction: column; gap: 20px;">
-                <div class="card">
+
+                <!-- ✅ 訂單進度：預設隱藏，等 JS 讀到資料才顯示 -->
+                <div class="card" id="orderProgressCard" style="display: none;">
                     <h2 class="member-section-title">訂單進度</h2>
-                    <div style="margin-bottom: 20px;">
-                        <div class="order-item" style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <span>訂單 #2026010501 (美國重磅巧克力餅乾)</span>
-                            <span style="color:blue; font-weight: bold;">出貨中</span>
-                        </div>
-                        <div class="progress-container"><div class="progress-bar" style="width: 60%;"></div></div>
-                        <p style="font-size:0.85rem; text-align:right;">已離開轉運中心</p>
-                    </div>
+                    <div id="orderProgressContent"></div>
                 </div>
 
+                <!-- 歷史消費紀錄（目前先寫死示範） -->
                 <div class="card">
                     <h2 class="member-section-title">歷史消費紀錄</h2>
                     <table>
@@ -110,6 +108,7 @@
                     </table>
                 </div>
 
+                <!-- 評論與評分紀錄 -->
                 <div class="card">
                     <h2 class="member-section-title">評論與評分紀錄</h2>
                     <div id="myReviews"><p>尚無評論紀錄。</p></div>
@@ -148,8 +147,12 @@
                 document.getElementById('mEmail').innerText = user.email;
                 document.getElementById('mPhone').innerText = user.phone || "-";
                 document.getElementById('avatarLink').href = "member.html";
+
                 // 用 user.id 去後端抓這個會員的評論
                 loadMyReviews(user.id);
+
+                // ✅ 新增：載入這個會員的「最新訂單進度」
+                loadOrderProgress(user.id);
             }
         };
 
@@ -157,6 +160,50 @@
             localStorage.removeItem('tt_currentUser');
             alert("已登出");
             window.location.href = 'login.html';
+        }
+
+        // ✅ 從 localStorage 撈「這個會員的最新訂單」
+        // 你之後可以把這裡改成呼叫後端 API 撈真的訂單資料
+        function loadOrderProgress(userId) {
+            var card = document.getElementById('orderProgressCard');
+            var content = document.getElementById('orderProgressContent');
+            if (!card || !content) return;
+
+            // 從 localStorage 抓最新訂單資料
+            var raw = localStorage.getItem('tt_latestOrder');
+            if (!raw) {
+                // 沒有訂單 → 保持隱藏（什麼都不做）
+                return;
+            }
+
+            var order = JSON.parse(raw);
+
+            // 如果有多帳號，檢查一下是不是同一個會員
+            if (order.userId !== userId) {
+                return;
+            }
+
+            // 有訂單 → 顯示卡片
+            card.style.display = 'block';
+
+            // 給預設值避免 undefined
+            var orderId = order.orderId || '(尚未產生編號)';
+            var productName = order.productName || '訂單商品';
+            var statusText = order.statusText || '處理中';
+            var progressPercent = order.progressPercent || 30; // 0~100
+            var desc = order.desc || '';
+
+            content.innerHTML =
+                '<div style="margin-bottom: 20px;">' +
+                    '<div class="order-item" style="display:flex; justify-content:space-between; margin-bottom:10px;">' +
+                        '<span>訂單 #' + orderId + ' (' + productName + ')</span>' +
+                        '<span style="color:blue; font-weight: bold;">' + statusText + '</span>' +
+                    '</div>' +
+                    '<div class="progress-container">' +
+                        '<div class="progress-bar" style="width: ' + progressPercent + '%;"></div>' +
+                    '</div>' +
+                    '<p style="font-size:0.85rem; text-align:right;">' + desc + '</p>' +
+                '</div>';
         }
 
         // 從後端撈「這個會員的所有評論」
