@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品總覽 - Treat Trader</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            justify-items: center;
+            align-items: center;
+        }
+        .product-card {
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .img-placeholder {
+            height: 150px;
+            width: 180px;
+            background: #eee;
+            border-radius: 10px;
+            margin: 0 auto 10px;
+            display: block;
+            color: #888;
+            object-fit: cover;
+        }
+        .rating-stars {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .rating-stars .active {
+            color: #e2b007;
+        }
+        
+        .mid-filter { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            margin-bottom: 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+
+        .filter-left { 
+            display: flex; 
+            flex: 1; 
+            min-width: 250px; 
+        }
+
+        .filter-left input { 
+            flex: 1; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px 0 0 5px; 
+            border-right: none; 
+            outline: none; 
+        }
+
+        .filter-left button { 
+            border-radius: 0 5px 5px 0;
+            padding: 10px 20px; 
+        }
+
+        .filter-right { 
+            flex: 0.5; 
+            min-width: 200px; 
+        }
+
+        .filter-right select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            outline: none; 
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+    <div class="marquee-container">✨ 新年回饋祭滿 $2500 免運 ✨</div>
+    <header>
+        <div class="logo" onclick="location.href='index.html'">
+            <img src="images/Logo.PNG" alt="Logo">
+            Treat Trader
+        </div>
+
+        <nav class="main-nav">
+            <a href="index.html">首頁</a>
+            <a href="allgoods.html">商品總覽</a>
+            <a href="member.html">會員資料</a>
+            <a href="team.html">關於我們</a>
+        </nav>
+
+        <div class="header-icons">
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a href="login.html" id="avatarLink"><i class="fa-solid fa-circle-user"></i></a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 搜尋欄&篩選 -->
+        <div class="mid-filter">
+            <div class="filter-left">
+                <input type="text" id="midSearch" placeholder="商品關鍵字快速搜尋" onkeypress="handleEnterFilter(event)">
+                <button class="btn" onclick="filterProducts()">搜尋</button>
+            </div>
+            <div class="filter-right">
+                <select id="midCategory" onchange="filterProducts()">
+                    <option value="all">所有類別</option>
+                    <option value="japan">日本 (Japan)</option>
+                    <option value="france">法國 (France)</option>
+                    <option value="germany">德國 (Germany)</option>
+                    <option value="belgium">比利時 (Belgium)</option>
+                    <option value="italy">義大利 (Italy)</option>
+                    <option value="usa">美國 (USA)</option>
+                    <option value="uk">英國 (UK)</option>
+                    <option value="korea">韓國 (Korea)</option>
+                    <option value="taiwan">台灣 (Taiwan)</option>
+                </select>
+            </div>
+        </div>
+        
+        <h2>全部商品</h2>
+        <div id="productList" class="product-grid"></div>
+    </div>
+
+    <div class="scroll-top" onclick="window.scrollTo(0,0)">TOP</div>
+
+    <footer>
+        <div class="footer-socials">
+            <a href="https://reurl.cc/xKA8ae" target="_blank">
+                <i class="fa-brands fa-instagram"></i></a>
+            <a href="https://reurl.cc/Vmlo9A" target="_blank">
+                <i class="fa-brands fa-threads"></i></a>
+            <a href="https://reurl.cc/9ba94j" target="_blank">
+                <i class="fa-brands fa-line"></i></a>
+            <a href="mailto:service@example.com">
+                <i class="fa-solid fa-envelope"></i></a>
+        </div>
+        <div class="footer-links"><a href="help.html">幫助中心</a> | <a href="question.html">常見問題</a></div>
+        <p class="copyright">© COPYRIGHT 807dorm</p>
+    </footer>
+
+    <script>
+        const API_BASE = "http://localhost:5038/api"; // 記得跟後端 port 一致
+
+        var allData = [];          // 商品列表資料
+        var productRatings = {};   // 每個商品的平均星等 { productId: avgRating }
+
+        window.onload = function() {
+            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+            if (user) document.getElementById('avatarLink').href = "member.html";
+            fetchData();
+        };
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var searchKey = urlParams.get('search');
+
+        // 從後端抓每個商品的評論，計算平均星等
+        function loadRatingsForProducts(products) {
+            var tasks = products.map(function (p) {
+                return fetch(API_BASE + "/Reviews/product/" + p.id + "?page=1&pageSize=9999")
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        var items = data.items || [];
+                        if (!items.length) {
+                            productRatings[p.id] = 0;
+                            return;
+                        }
+                        var sum = 0, count = 0;
+                        items.forEach(function (r) {
+                            var rating = Number(r.rating);
+                            if (!isNaN(rating) && rating > 0) {
+                                sum += rating;
+                                count++;
+                            }
+                        });
+                        productRatings[p.id] = count ? parseFloat((sum / count).toFixed(1)) : 0;
+                    })
+                    .catch(function () {
+                        // 若發生錯誤，當作暫無評分
+                        productRatings[p.id] = 0;
+                    });
+            });
+
+            return Promise.all(tasks);
+        }
+
+        function fetchData() {
+            fetch('products.json')
+                .then(function(res){ return res.json(); })
+                .then(function(data){
+                    allData = data; // 存起來給篩選用
+                    
+                    // 先抓所有商品的星等，再渲染畫面
+                    return loadRatingsForProducts(data).then(function () {
+                        var displayData = data;
+                        if (searchKey) {
+                            displayData = data.filter(function(p){ return p.name.includes(searchKey); });
+                            document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
+                            if (document.getElementById('midSearch')) {
+                                document.getElementById('midSearch').value = searchKey;
+                            }
+                        }
+                        renderList(displayData);
+                    });
+                });
+        }
+
+        // 從全域的 productRatings 裡拿平均星等
+        function calculateAvgRating(pid) {
+            return productRatings[pid] || 0;
+        }
+
+        function renderStars(rating) {
+            var html = "";
+            for (var i = 1; i <= 5; i++) {
+                if (i <= Math.round(rating)) html += '<i class="fa-solid fa-star active"></i>';
+                else html += '<i class="fa-solid fa-star"></i>';
+            }
+            if (rating == 0) {
+                return html + ' <span style="color:#aaa; font-size: 0.8rem;">(暫無評分)</span>';
+            }
+
+            return html + ' <span style="color:#555;">(' + rating.toFixed(1) + ')</span>';
+        }
+
+        function renderList(data) {
+            var container = document.getElementById("productList");
+    
+            // 如果搜尋不到任何商品
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 15px;">
+                        <i class="fa-solid fa-cookie-bite" style="font-size: 4rem; color: #FFD2A6; margin-bottom: 20px;"></i>
+                        <h3 style="color: #5C4033;">喔喔！找不到相關商品</h3>
+                        <p style="color: #888; margin-bottom: 20px;">試試看其他關鍵字，或是看看我們的熱門推薦。</p>
+                        <button onclick="location.href='allgoods.html'" class="btn">查看所有商品</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // 若有資料，正常顯示商品
+            container.innerHTML = data.map(function(p) {
+                var rating = calculateAvgRating(p.id);
+                return '' +
+                    '<div class="card product-card" onclick="location.href=\'goods.html?id='+p.id+'\'">' +
+                        '<img class="img-placeholder" src="images/' + p.img + '"></img>' +
+                        '<h4>' + p.name + '</h4>' +
+                        '<p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p>' +
+                        '<div class="rating-stars">' + renderStars(rating) + '</div>' +
+                    '</div>';
+            }).join("");
+        }
+
+        // 偵測點擊了沒（關閉搜尋建議）
+        document.addEventListener('click', function(e) {
+            var box = document.getElementById('searchSuggestions');
+            var input = document.getElementById('globalSearch');
+            if (!box || !input) return;
+    
+            if (e.target !== box && e.target !== input) {
+                box.style.display = 'none';
+            }
+        });
+
+        // 全站搜尋相關
+        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
+        function siteSearch() {
+            var input = document.getElementById('globalSearch');
+            if (!input) return;
+            var val = input.value.trim();
+            if(!val) return;
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.includes(val); });
+                if(matches.length === 0) alert("沒有搜尋到相關商品！");
+                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
+            });
+        }
+
+        function handleSearchInput(input) {
+            var val = input.value.toLowerCase();
+            var box = document.getElementById('searchSuggestions');
+            if (!box) return;
+            if(val.length < 1) { box.style.display = 'none'; return; }
+            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
+                if(matches.length > 0) {
+                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
+                    box.style.display = 'block';
+                } else { box.style.display = 'none'; }
+            });
+        }
+
+        // 中間篩選區（關鍵字 + 類別）
+        function handleEnterFilter(e) { if(e.key === 'Enter') filterProducts(); }
+
+        function filterProducts() {
+            var key = document.getElementById("midSearch").value.toLowerCase();
+            var cat = document.getElementById("midCategory").value;
+            
+            var filtered = allData.filter(function(p){ 
+                var matchKey = p.name.toLowerCase().includes(key);
+                var matchCat = (cat === "all" || p.category === cat);
+                return matchKey && matchCat;
+            });
+            
+            document.querySelector('h2').innerText = (key || cat !== "all") ? "篩選結果" : "全部商品";
+            renderList(filtered);
+        }
+    </script>
+</body>
+</html>
