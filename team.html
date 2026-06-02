@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>關於我們 - Treat Trader</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* 團隊與品牌專用樣式 */
@@ -88,7 +88,7 @@
     <div class="marquee-container">✨ 認識我們的團隊 ✨ 致力於為您提供最優質的購物體驗 ✨</div>
     <header>
         <div class="logo" onclick="location.href='index.html'">
-            <img src="images/Logo.PNG" alt="Logo">
+            <img src="assets/images/Logo.PNG" alt="Logo">
             Treat Trader
         </div>
 
@@ -169,36 +169,6 @@
         <p class="copyright">© COPYRIGHT 807dorm</p>
     </footer>
 
-    <script>
-        window.onload = function() {
-            var user = JSON.parse(localStorage.getItem('tt_currentUser'));
-            if(user) document.getElementById('avatarLink').href = "member.html";
-        };
-
-        function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
-        
-        function siteSearch() {
-            var val = document.getElementById('globalSearch').value.trim();
-            if(!val) return;
-            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
-                var matches = data.filter(function(p){ return p.name.includes(val); });
-                if(matches.length === 0) alert("沒有搜尋到相關商品！");
-                else location.href = "allgoods.html?search=" + encodeURIComponent(val);
-            });
-        }
-        
-        function handleSearchInput(input) {
-            var val = input.value.toLowerCase();
-            var box = document.getElementById('searchSuggestions');
-            if(val.length < 1) { box.style.display = 'none'; return; }
-            fetch('products.json').then(function(r){ return r.json() }).then(function(data){
-                var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
-                if(matches.length > 0) {
-                    box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');
-                    box.style.display = 'block';
-                } else { box.style.display = 'none'; }
-            });
-        }
-    </script>
+    <script src="assets/js/team.js"></script>
 </body>
 </html>
