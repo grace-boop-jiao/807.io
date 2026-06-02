@@ -1,5 +1,27 @@
 var map;
 
+function getCartKey() {
+    var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+    return user ? 'tt_cart_user_' + user.id : 'tt_cart';
+}
+
+function getCart() {
+    var key = getCartKey();
+    var cart = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!cart.length && key !== 'tt_cart') {
+        var fallback = JSON.parse(localStorage.getItem('tt_cart') || '[]');
+        if (fallback.length) {
+            cart = fallback;
+            localStorage.setItem(key, JSON.stringify(cart));
+        }
+    }
+    return cart;
+}
+
+function saveCart(cart) {
+    localStorage.setItem(getCartKey(), JSON.stringify(cart));
+}
+
 window.onload = function() {
     var user = JSON.parse(localStorage.getItem('tt_currentUser'));
     
@@ -97,7 +119,7 @@ function initMap() {
 }
 
 function renderCart() {
-    var cart = JSON.parse(localStorage.getItem('tt_cart') || "[]");
+    var cart = getCart();
     var container = document.getElementById('cartItems');
     var total = 0;
 
@@ -133,18 +155,18 @@ function renderCart() {
 }
 
 function updateQty(idx, change) {
-    var cart = JSON.parse(localStorage.getItem('tt_cart'));
+    var cart = getCart();
     if(cart[idx].qty + change >= 1) {
         cart[idx].qty += change;
-        localStorage.setItem('tt_cart', JSON.stringify(cart));
+        saveCart(cart);
         renderCart();
     }
 }
 
 function removeItem(idx) {
-    var cart = JSON.parse(localStorage.getItem('tt_cart'));
+    var cart = getCart();
     cart.splice(idx, 1);
-    localStorage.setItem('tt_cart', JSON.stringify(cart));
+    saveCart(cart);
     renderCart();
 }
 
@@ -152,7 +174,7 @@ function toggleCheckout(show) {
     var cartCol = document.getElementById('cartListContainer');
     var checkCol = document.getElementById('checkoutContainer');
     var btn = document.getElementById('toCheckoutBtn');
-    var cartItems = JSON.parse(localStorage.getItem('tt_cart') || "[]");
+    var cartItems = getCart();
 
     if(show) {
         if(cartItems.length === 0) return;
@@ -220,12 +242,21 @@ function submitOrder() {
     
     for(var i=0; i<inputs.length; i++) {
         if(inputs[i].type !== 'hidden' && inputs[i].offsetParent !== null) {
-            if(!inputs[i].readOnly && inputs[i].value.trim() === "") {
+            if(inputs[i].value.trim() === "") {
                 allFilled = false;
                 inputs[i].style.borderColor = "red";
             } else {
                 inputs[i].style.borderColor = "#ddd";
             }
+        }
+    }
+
+    var shipMethod = document.getElementById('shipMethodValue').value;
+    if (shipMethod === 'store') {
+        var storeInput = document.getElementById('storeNameInput');
+        if (!storeInput || storeInput.value.trim() === '') {
+            allFilled = false;
+            if (storeInput) storeInput.style.borderColor = 'red';
         }
     }
     
@@ -269,11 +300,14 @@ function submitOrder() {
             desc: '商品準備中'
         };
 
+        var orders = JSON.parse(localStorage.getItem('tt_orders') || '[]');
+        orders.push(latestOrder);
+        localStorage.setItem('tt_orders', JSON.stringify(orders));
         localStorage.setItem('tt_latestOrder', JSON.stringify(latestOrder));
     }
     
     alert('訂單已送出！感謝您的購買。');
-    localStorage.removeItem('tt_cart');
+    saveCart([]);
     window.location.href = 'member.html';
 }
 

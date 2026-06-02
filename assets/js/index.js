@@ -88,7 +88,7 @@ function renderProducts(list) {
             '<img src="assets/images/' + p.img + '" alt="' + p.name + '" style="width:100%; height:100%; object-fit:cover;">' + 
             '</div>' +
             '<h4>' + p.name + '</h4>' +
-            '<p>$' + p.price + '</p></div>';
+            '<p style="color:#FF7F50; font-weight:bold;">$' + p.price + '</p></div>';
     }).join("");
 }
 

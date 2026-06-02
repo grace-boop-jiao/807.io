@@ -27,36 +27,64 @@ function loadOrderProgress(userId) {
     var content = document.getElementById('orderProgressContent');
     if (!card || !content) return;
 
-    var raw = localStorage.getItem('tt_latestOrder');
-    if (!raw) {
-        return;
+    var orders = [];
+    var rawOrders = localStorage.getItem('tt_orders');
+    if (rawOrders) {
+        try {
+            orders = JSON.parse(rawOrders) || [];
+        } catch (e) {
+            orders = [];
+        }
     }
 
-    var order = JSON.parse(raw);
+    if (!orders || orders.length === 0) {
+        var rawLatest = localStorage.getItem('tt_latestOrder');
+        if (rawLatest) {
+            try {
+                var latestOrder = JSON.parse(rawLatest);
+                if (latestOrder && latestOrder.userId === userId) {
+                    orders = [latestOrder];
+                }
+            } catch (e) {
+                orders = [];
+            }
+        }
+    }
 
-    if (order.userId !== userId) {
+    orders = orders.filter(function(order) {
+        return order && order.userId === userId;
+    });
+
+    orders.sort(function(a, b) {
+        return b.orderId.localeCompare(a.orderId);
+    });
+
+    if (!orders || orders.length === 0) {
         return;
     }
 
     card.style.display = 'block';
 
-    var orderId = order.orderId || '(尚未產生編號)';
-    var productName = order.productName || '訂單商品';
-    var statusText = order.statusText || '處理中';
-    var progressPercent = order.progressPercent || 30;
-    var desc = order.desc || '';
+    content.innerHTML = orders.map(function(order) {
+        var orderId = order.orderId || '(尚未產生編號)';
+        var productName = order.productName || '訂單商品';
+        var statusText = order.statusText || '處理中';
+        var progressPercent = order.progressPercent || 30;
+        var desc = order.desc || '';
 
-    content.innerHTML =
-        '<div style="margin-bottom: 20px;">' +
-            '<div class="order-item" style="display:flex; justify-content:space-between; margin-bottom:10px;">' +
-                '<span>訂單 #' + orderId + ' (' + productName + ')</span>' +
-                '<span style="color:blue; font-weight: bold;">' + statusText + '</span>' +
-            '</div>' +
-            '<div class="progress-container">' +
-                '<div class="progress-bar" style="width: ' + progressPercent + '%;"></div>' +
-            '</div>' +
-            '<p style="font-size:0.85rem; text-align:right;">' + desc + '</p>' +
-        '</div>';
+        return (
+            '<div style="margin-bottom: 20px; border-bottom: 1px solid #f0e0d8; padding-bottom: 15px;">' +
+                '<div class="order-item" style="display:flex; justify-content:space-between; margin-bottom:10px;">' +
+                    '<span>訂單 #' + orderId + ' (' + productName + ')</span>' +
+                    '<span style="color:blue; font-weight: bold;">' + statusText + '</span>' +
+                '</div>' +
+                '<div class="progress-container">' +
+                    '<div class="progress-bar" style="width: ' + progressPercent + '%;"></div>' +
+                '</div>' +
+                '<p style="font-size:0.85rem; text-align:right; margin-top: 8px;">' + desc + '</p>' +
+            '</div>'
+        );
+    }).join('');
 }
 
 function loadMyReviews(userId) {
