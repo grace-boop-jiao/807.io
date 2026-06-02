@@ -73,6 +73,27 @@ function loadRecs(all) {
     }).join('');
 }
 
+function getCartKey() {
+    var user = JSON.parse(localStorage.getItem('tt_currentUser'));
+    return user ? 'tt_cart_user_' + user.id : 'tt_cart';
+}
+
+function getCart() {
+    var cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+    if (!cart.length) {
+        var fallback = JSON.parse(localStorage.getItem('tt_cart') || '[]');
+        if (fallback.length) {
+            cart = fallback;
+            localStorage.setItem(getCartKey(), JSON.stringify(cart));
+        }
+    }
+    return cart;
+}
+
+function saveCart(cart) {
+    localStorage.setItem(getCartKey(), JSON.stringify(cart));
+}
+
 function addToCart(goCheckout) {
     var user = JSON.parse(localStorage.getItem('tt_currentUser'));
     if (!user) {
@@ -82,12 +103,12 @@ function addToCart(goCheckout) {
     }
     if (!currentProduct) return;
 
-    var cart = JSON.parse(localStorage.getItem('tt_cart') || "[]");
+    var cart = getCart();
     var item = cart.find(function (i) { return i.id == pid; });
     if (item) item.qty++;
     else cart.push({ id: pid, qty: 1, name: currentProduct.name, price: currentProduct.price });
 
-    localStorage.setItem('tt_cart', JSON.stringify(cart));
+    saveCart(cart);
     if (goCheckout) location.href = 'cart.html';
     else alert("已加入購物車！");
 }
@@ -114,11 +135,12 @@ function getFakeReviewsForProduct() {
     ];
 }
 
-function updateProductRatingFromReviews(realReviews) {
+function updateProductRatingFromReviews(reviews) {
     var display = document.getElementById('pRatingDisplay');
     if (!display) return;
 
-    if (!realReviews || realReviews.length === 0) {
+    reviews = reviews || [];
+    if (reviews.length === 0) {
         display.innerHTML = '暫無評分';
         return;
     }
@@ -126,7 +148,7 @@ function updateProductRatingFromReviews(realReviews) {
     var sum = 0;
     var count = 0;
 
-    realReviews.forEach(function (r) {
+    reviews.forEach(function (r) {
         var rating = Number(r.rating);
         if (!isNaN(rating) && rating > 0) {
             sum += rating;
@@ -157,7 +179,7 @@ function loadReviews() {
             var realReviews = data.items || [];
             var allReviews = getFakeReviewsForProduct().concat(realReviews);
 
-            updateProductRatingFromReviews(realReviews);
+            updateProductRatingFromReviews(allReviews);
 
             allReviews.sort(function (a, b) {
                 var da = new Date(a.date);
