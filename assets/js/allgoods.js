@@ -1,5 +1,3 @@
-const API_BASE = "http://localhost:5038/api";
-
 var allData = [];
 var productRatings = {};
 
@@ -23,54 +21,46 @@ var urlParams = new URLSearchParams(window.location.search);
 var searchKey = urlParams.get('search');
 
 function loadRatingsForProducts(products) {
-    var tasks = products.map(function (p) {
-        return fetch(API_BASE + "/Reviews/product/" + p.id + "?page=1&pageSize=9999")
-            .then(function (res) { return res.json(); })
-            .then(function (data) {
-                var items = data.items || [];
-                var ratings = getDefaultReviewRatings().slice();
+    // Use localStorage-stored reviews as mock backend
+    try {
+        var reviews = JSON.parse(localStorage.getItem('tt_reviews') || '[]');
+    } catch (e) { reviews = []; }
 
-                items.forEach(function (r) {
-                    var rating = Number(r.rating);
-                    if (!isNaN(rating) && rating > 0) {
-                        ratings.push(rating);
-                    }
-                });
+    products.forEach(function (p) {
+        var items = reviews.filter(function(r){ return Number(r.productId) === Number(p.id); });
+        var ratings = getDefaultReviewRatings().slice();
 
-                if (ratings.length === 0) {
-                    productRatings[p.id] = 0;
-                    return;
-                }
+        items.forEach(function (r) {
+            var rating = Number(r.rating);
+            if (!isNaN(rating) && rating > 0) ratings.push(rating);
+        });
 
-                var sum = ratings.reduce(function (acc, value) { return acc + value; }, 0);
-                productRatings[p.id] = parseFloat((sum / ratings.length).toFixed(1));
-            })
-            .catch(function () {
-                productRatings[p.id] = getDefaultAverageRating();
-            });
+        if (ratings.length === 0) productRatings[p.id] = 0;
+        else {
+            var sum = ratings.reduce(function (acc, value) { return acc + value; }, 0);
+            productRatings[p.id] = parseFloat((sum / ratings.length).toFixed(1));
+        }
     });
 
-    return Promise.all(tasks);
+    return Promise.resolve();
 }
 
 function fetchData() {
-    fetch('products.json')
-        .then(function(res){ return res.json(); })
-        .then(function(data){
-            allData = data;
-            
-            return loadRatingsForProducts(data).then(function () {
-                var displayData = data;
-                if (searchKey) {
-                    displayData = data.filter(function(p){ return p.name.includes(searchKey); });
-                    document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
-                    if (document.getElementById('midSearch')) {
-                        document.getElementById('midSearch').value = searchKey;
-                    }
+    return getProducts().then(function(data){
+        allData = data;
+
+        return loadRatingsForProducts(data).then(function () {
+            var displayData = data;
+            if (searchKey) {
+                displayData = data.filter(function(p){ return p.name.includes(searchKey); });
+                document.querySelector('h2').innerText = "搜尋結果： " + searchKey;
+                if (document.getElementById('midSearch')) {
+                    document.getElementById('midSearch').value = searchKey;
                 }
-                renderList(displayData);
-            });
+            }
+            renderList(displayData);
         });
+    });
 }
 
 function calculateAvgRating(pid) {
@@ -133,7 +123,7 @@ function siteSearch() {
     if (!input) return;
     var val = input.value.trim();
     if(!val) return;
-    fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+    getProducts().then(function(data){
         var matches = data.filter(function(p){ return p.name.includes(val); });
         if(matches.length === 0) alert("沒有搜尋到相關商品！");
         else location.href = "allgoods.html?search=" + encodeURIComponent(val);
@@ -145,7 +135,7 @@ function handleSearchInput(input) {
     var box = document.getElementById('searchSuggestions');
     if (!box) return;
     if(val.length < 1) { box.style.display = 'none'; return; }
-    fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+    getProducts().then(function(data){
         var matches = data.filter(function(p){ return p.name.toLowerCase().includes(val); });
         if(matches.length > 0) {
             box.innerHTML = matches.map(function(p){ return '<div onclick="location.href=\'goods.html?id='+p.id+'\'">'+p.name+'</div>'; }).join('');

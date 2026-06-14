@@ -1,5 +1,3 @@
-const API_BASE = "http://localhost:5038/api";
-
 window.onload = function () {
     var user = JSON.parse(localStorage.getItem('tt_currentUser'));
     if (user) document.getElementById('avatarLink').href = "member.html";
@@ -18,29 +16,21 @@ function handleRegister(e) {
         return;
     }
 
-    fetch(API_BASE + "/Auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            name: name,
-            email: email,
-            password: pwd,
-            phone: phone,
-            address: null
-        })
-    })
-    .then(function (res) {
-        if (!res.ok) return res.json().then(function (err) { throw err; });
-        return res.json();
-    })
-    .then(function (user) {
-        localStorage.setItem("tt_currentUser", JSON.stringify(user));
-        alert("註冊成功！");
-        location.href = "member.html";
-    })
-    .catch(function (err) {
-        alert(err.message || "註冊失敗");
-    });
+    try {
+        var users = JSON.parse(localStorage.getItem('tt_users') || '[]');
+    } catch (e) { users = []; }
+
+    // uniqueness checks
+    if (users.find(function(u){ return u.email === email; })) { alert('此 Email 已被使用'); return; }
+    if (phone && users.find(function(u){ return u.phone === phone; })) { alert('此電話已被使用'); return; }
+
+    var nextId = users.length ? Math.max.apply(null, users.map(function(u){ return u.id || 0; })) + 1 : 1;
+    var newUser = { id: nextId, name: name, email: email, password: pwd, phone: phone, address: '' };
+    users.push(newUser);
+    localStorage.setItem('tt_users', JSON.stringify(users));
+    localStorage.setItem('tt_currentUser', JSON.stringify(newUser));
+    alert('註冊成功！');
+    location.href = 'member.html';
 }
 
 function handleLogin(e) {
@@ -54,26 +44,15 @@ function handleLogin(e) {
         return;
     }
 
-    fetch(API_BASE + "/Auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            email: email,
-            password: pwd
-        })
-    })
-    .then(function (res) {
-        if (!res.ok) return res.json().then(function (err) { throw err; });
-        return res.json();
-    })
-    .then(function (user) {
-        localStorage.setItem("tt_currentUser", JSON.stringify(user));
-        alert("登入成功！");
-        location.href = "member.html";
-    })
-    .catch(function (err) {
-        alert(err.message || "登入失敗，請確認帳號密碼");
-    });
+    try {
+        var users = JSON.parse(localStorage.getItem('tt_users') || '[]');
+    } catch (e) { users = []; }
+
+    var found = users.find(function(u){ return u.email === email && u.password === pwd; });
+    if (!found) { alert('登入失敗，請確認帳號密碼'); return; }
+    localStorage.setItem('tt_currentUser', JSON.stringify(found));
+    alert('登入成功！');
+    location.href = 'member.html';
 }
 
 function showForgetModal() { document.getElementById('forgetModal').style.display = 'flex'; }

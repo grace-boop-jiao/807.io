@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5038/api";
+// Backend removed — use localStorage mocks for reviews/auth where needed
 
 var urlParams = new URLSearchParams(window.location.search);
 var pid = urlParams.get('id') || '1';
@@ -33,8 +33,7 @@ window.onload = function () {
 
     setRating(5);
 
-    fetch('products.json')
-        .then(function (res) { return res.json(); })
+    getProducts()
         .then(function (data) {
             currentProduct = data.find(function (p) { return p.id == pid; });
             if (currentProduct) {
@@ -173,59 +172,56 @@ function updateProductRatingFromReviews(reviews) {
 }
 
 function loadReviews() {
-    fetch(API_BASE + "/Reviews/product/" + pid + "?page=1&pageSize=9999")
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-            var realReviews = data.items || [];
-            var allReviews = getFakeReviewsForProduct().concat(realReviews);
+    try {
+        var stored = JSON.parse(localStorage.getItem('tt_reviews') || '[]');
+    } catch (e) { stored = []; }
 
-            updateProductRatingFromReviews(allReviews);
+    var realReviews = stored.filter(function(r){ return Number(r.productId) === Number(pid); });
+    var allReviews = getFakeReviewsForProduct().concat(realReviews);
 
-            allReviews.sort(function (a, b) {
-                var da = new Date(a.date);
-                var db = new Date(b.date);
-                return db - da;
-            });
+    updateProductRatingFromReviews(allReviews);
 
-            var totalPages = Math.ceil(allReviews.length / reviewsPerPage);
-            if (totalPages === 0) totalPages = 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            if (currentPage < 1) currentPage = 1;
+    allReviews.sort(function (a, b) {
+        var da = new Date(a.date);
+        var db = new Date(b.date);
+        return db - da;
+    });
 
-            var start = (currentPage - 1) * reviewsPerPage;
-            var end = start + reviewsPerPage;
-            var pageReviews = allReviews.slice(start, end);
+    var totalPages = Math.ceil(allReviews.length / reviewsPerPage);
+    if (totalPages === 0) totalPages = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
 
-            var container = document.getElementById('commentList');
-            if (!container) return;
+    var start = (currentPage - 1) * reviewsPerPage;
+    var end = start + reviewsPerPage;
+    var pageReviews = allReviews.slice(start, end);
 
-            if (pageReviews.length === 0) {
-                container.innerHTML = '<p style="padding:10px;">目前尚無評論，快來當第一個評論的人！</p>';
-            } else {
-                container.innerHTML = pageReviews.map(function (r) {
-                    var stars = '';
-                    var rating = r.rating || 0;
-                    for (var i = 0; i < 5; i++) {
-                        var cls = (i < rating) ? 'filled' : 'empty';
-                        stars += '<span class="review-star ' + cls + '">★</span>';
-                    }
-                    return '' +
-                        '<div class="review-card">' +
-                            '<div class="review-header">' +
-                                '<span class="review-user">' + (r.userName || '匿名') + '</span>' +
-                                '<span class="review-date">' + (r.date || '') + '</span>' +
-                            '</div>' +
-                            '<div class="review-rating">' + stars + '</div>' +
-                            '<div class="review-content">' + (r.content || '') + '</div>' +
-                        '</div>';
-                }).join('');
+    var container = document.getElementById('commentList');
+    if (!container) return;
+
+    if (pageReviews.length === 0) {
+        container.innerHTML = '<p style="padding:10px;">目前尚無評論，快來當第一個評論的人！</p>';
+    } else {
+        container.innerHTML = pageReviews.map(function (r) {
+            var stars = '';
+            var rating = r.rating || 0;
+            for (var i = 0; i < 5; i++) {
+                var cls = (i < rating) ? 'filled' : 'empty';
+                stars += '<span class="review-star ' + cls + '">★</span>';
             }
+            return '' +
+                '<div class="review-card">' +
+                    '<div class="review-header">' +
+                        '<span class="review-user">' + (r.userName || '匿名') + '</span>' +
+                        '<span class="review-date">' + (r.date || '') + '</span>' +
+                    '</div>' +
+                    '<div class="review-rating">' + stars + '</div>' +
+                    '<div class="review-content">' + (r.content || '') + '</div>' +
+                '</div>';
+        }).join('');
+    }
 
-            renderPagination(totalPages);
-        })
-        .catch(function (err) {
-            console.error("讀取評論失敗", err);
-        });
+    renderPagination(totalPages);
 }
 
 function renderPagination(totalPages) {
@@ -277,31 +273,34 @@ function submitReview() {
         return;
     }
 
-    fetch(API_BASE + "/Reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            productId: parseInt(pid),
-            userId: user.id,
-            userName: user.name,
-            rating: currentRating,
-            content: content
-        })
-    })
-    .then(function (res) {
-        if (!res.ok) return res.json().then(function (err) { throw err; });
-        return res.json();
-    })
-    .then(function () {
-        alert("評論已送出！");
-        contentInput.value = "";
-        currentPage = 1;
-        loadReviews();
-    })
-    .catch(function (err) {
-        alert(err.message || "評論送出失敗");
-        console.error(err);
-    });
+    try {
+        var stored = JSON.parse(localStorage.getItem('tt_reviews') || '[]');
+    } catch (e) { stored = []; }
+
+    var nextId = 1;
+    if (stored.length) nextId = Math.max.apply(null, stored.map(function(r){ return r.reviewId || 0; })) + 1;
+
+    var now = new Date();
+    var dateStr = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2,'0') + '/' + String(now.getDate()).padStart(2,'0');
+
+    var newReview = {
+        reviewId: nextId,
+        productId: parseInt(pid),
+        userId: user.id,
+        userName: user.name,
+        rating: currentRating,
+        content: content,
+        date: dateStr,
+        orderId: 0
+    };
+
+    stored.push(newReview);
+    localStorage.setItem('tt_reviews', JSON.stringify(stored));
+
+    alert("評論已送出！");
+    contentInput.value = "";
+    currentPage = 1;
+    loadReviews();
 }
 
 function switchTab(e, id) {
@@ -324,8 +323,7 @@ function siteSearch() {
     var val = input.value.trim();
     if (!val) return;
 
-    fetch('products.json')
-        .then(function (r) { return r.json(); })
+    getProducts()
         .then(function (data) {
             var matches = data.filter(function (p) { return p.name.includes(val); });
             if (matches.length === 0) alert("沒有搜尋到相關商品！");
@@ -343,8 +341,7 @@ function handleSearchInput(input) {
         return;
     }
 
-    fetch('products.json')
-        .then(function (r) { return r.json(); })
+    getProducts()
         .then(function (data) {
             var matches = data.filter(function (p) {
                 return p.name.toLowerCase().includes(val);

@@ -1,5 +1,3 @@
-const API_BASE = "http://localhost:5038/api";
-
 window.onload = function() {
     var user = JSON.parse(localStorage.getItem('tt_currentUser'));
     if (!user) {
@@ -88,41 +86,41 @@ function loadOrderProgress(userId) {
 }
 
 function loadMyReviews(userId) {
-    fetch(API_BASE + "/Reviews/user/" + userId)
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-            var box = document.getElementById('myReviews');
-            if (!box) return;
+    try { var stored = JSON.parse(localStorage.getItem('tt_reviews') || '[]'); } catch (e) { stored = []; }
+    var my = stored.filter(function(r){ return Number(r.userId) === Number(userId); });
+    var box = document.getElementById('myReviews');
+    if (!box) return;
+    if (!my || my.length === 0) { box.innerHTML = '<p>尚無評論紀錄。</p>'; return; }
 
-            if (!data || data.length === 0) {
-                box.innerHTML = '<p>尚無評論紀錄。</p>';
-                return;
+    // try to map product names
+    getProducts().then(function(products){
+        var map = {};
+        (products || []).forEach(function(p){ map[p.id] = p.name; });
+
+        box.innerHTML = my.map(function (r) {
+            var stars = '';
+            var rating = r.rating || 0;
+            for (var i = 1; i <= 5; i++) {
+                var cls = i <= rating ? 'filled' : 'empty';
+                stars += '<span class="review-star ' + cls + '">★</span>';
             }
 
-            box.innerHTML = data.map(function (r) {
-                var stars = '';
-                var rating = r.rating || 0;
-                for (var i = 1; i <= 5; i++) {
-                    var cls = i <= rating ? 'filled' : 'empty';
-                    stars += '<span class="review-star ' + cls + '">★</span>';
-                }
-
-                var productName = r.productName || ('商品 #' + r.productId);
-                return (
-                    '<div class="review-card">' +
-                        '<div class="review-header">' +
-                            '<span class="review-user">' + productName + '</span>' +
-                            '<span class="review-date">' + (r.date || '') + '</span>' +
-                        '</div>' +
-                        '<div class="review-rating">' + stars + '</div>' +
-                        '<div class="review-content">' + (r.content || '') + '</div>' +
-                    '</div>'
-                );
-            }).join('');
-        })
-        .catch(function (err) {
-            console.error("載入會員評論失敗", err);
-        });
+            var productName = map[r.productId] || ('商品 #' + r.productId);
+            return (
+                '<div class="review-card">' +
+                    '<div class="review-header">' +
+                        '<span class="review-user">' + productName + '</span>' +
+                        '<span class="review-date">' + (r.date || '') + '</span>' +
+                    '</div>' +
+                    '<div class="review-rating">' + stars + '</div>' +
+                    '<div class="review-content">' + (r.content || '') + '</div>' +
+                '</div>'
+            );
+        }).join('');
+    }).catch(function(err){
+        console.error('載入商品資料失敗', err);
+        box.innerHTML = '<p>尚無評論紀錄。</p>';
+    });
 }
 
 function handleEnter(e) { if (e.key === 'Enter') siteSearch(); }
@@ -132,8 +130,7 @@ function siteSearch() {
 
     var val = input.value.trim();
     if (!val) return;
-    fetch('products.json')
-        .then(function(r){ return r.json(); })
+    getProducts()
         .then(function(data){
             var matches = data.filter(function(p){ return p.name.includes(val); });
             if(matches.length === 0) alert("沒有搜尋到相關商品！");
@@ -146,8 +143,7 @@ function handleSearchInput(input) {
     if (!box) return;
 
     if(val.length < 1) { box.style.display = 'none'; return; }
-    fetch('products.json')
-        .then(function(r){ return r.json(); })
+    getProducts()
         .then(function(data){
             var matches = data.filter(function(p){
                 return p.name.toLowerCase().includes(val);

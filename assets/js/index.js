@@ -2,7 +2,7 @@ function handleEnter(e) { if(e.key === 'Enter') siteSearch(); }
 function siteSearch() {
     var val = document.getElementById('globalSearch').value.trim();
     if(!val) return;
-    fetch('products.json').then(function(r){ return r.json() }).then(function(data){
+    getProducts().then(function(data){
         var matches = data.filter(function(p){ return p.name.includes(val); });
         if(matches.length === 0) alert("沒有搜尋到相關商品！");
         else location.href = "allgoods.html?search=" + encodeURIComponent(val);
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // --- 商品載入功能 ---
-fetch('products.json').then(function(res) { return res.json(); }).then(function(data) { 
+getProducts().then(function(data) { 
     renderProducts(data.slice(0, 8)); // 抓前 8 個當推薦
 });
 
